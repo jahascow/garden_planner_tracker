@@ -5,6 +5,7 @@ by : jahascow
 
 Module About:
     This file is for processing of plant specific data.
+    want to create color pallet dictionary for use within this app
     next to add is data entry form for logs with option selector for plant (optional?)
 """
 # Native
@@ -130,8 +131,17 @@ def menu_select(size,image,image_resize):
         '''Create the widgets for the contentframe1'''
         # Create a Treeview widget
         column_list = [r for r in display_df]
-        trv = ttk.Treeview(contentframe1, selectmode='browse', columns=column_list, show='headings',height=25)
-                
+        trv = ttk.Treeview(contentframe1, selectmode='browse', columns=column_list, show='headings',height=15)
+        # Add Some Style
+        style = ttk.Style() 
+        # Change Selected Color
+        style.map('Treeview', background=[('selected', "green")]) 
+        # Configure the Treeview Colors
+        style.configure("Treeview",
+            background="#e6ffe6",
+            foreground="black",
+            rowheight=25,
+            fieldbackground="#e6ffe6")
         '''Layout the widgets in the buttonsframe'''
         trv.grid(row=1,column=1,padx=20,pady=20)
         # Vertical scrollbar widget layout
@@ -153,10 +163,17 @@ def menu_select(size,image,image_resize):
 
         df_len = len(tuple(display_df.columns))
         df_list = []
+        # Create Striped Row Tags
+        trv.tag_configure('oddrow', background="#ebfeeb")
+        trv.tag_configure('evenrow', background="#f3fff3")
+
         for row in display_df.iterrows():
             for i in range(df_len):
                 df_list.append(row[1].values[i])
-            trv.insert("", END, iid=row[0], text=row[1], values=df_list)
+            if row[0] % 2 == 0:
+                trv.insert("", END, iid=row[0], text=row[1], values=df_list, tags=('evenrow',))
+            else:
+                trv.insert("", END, iid=row[0], text=row[1], values=df_list, tags=('oddrow',))
             df_list = []
     def add_plant():
         clearFrame() # clear out contentframe1 contents

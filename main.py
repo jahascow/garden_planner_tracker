@@ -126,12 +126,20 @@ def menu_select(size,image,image_resize):
         contentframe1.pack_forget()
     def show_plants():
         clearFrame() # clear out contentframe1 contents
+        def view_plant_entry():
+            # Get the currently selected item
+            selected_item = trv.selection()
+            if selected_item:
+                # Get the values of the selected item
+                item_values = trv.item(selected_item, 'values')
+            else:
+                print("No row selected")
         display_df = plants_obj.plant_df#.drop(columns=['Plant category', 'Genetics 1'])
         # Content Frame
         '''Create the widgets for the contentframe1'''
         # Create a Treeview widget
         column_list = [r for r in display_df]
-        trv = ttk.Treeview(contentframe1, selectmode='browse', columns=column_list, show='headings',height=15)
+        trv = ttk.Treeview(contentframe1, selectmode='browse', columns=column_list, show='headings',height=18)
         # Add Some Style
         style = ttk.Style() 
         # Change Selected Color
@@ -142,7 +150,8 @@ def menu_select(size,image,image_resize):
             foreground="black",
             rowheight=25,
             fieldbackground="#e6ffe6")
-        '''Layout the widgets in the buttonsframe'''
+        btn_select_record = Button(contentframe1, text="View Selected", font=("TkDefaultFont",10,'bold'), background='green', fg='white', command=view_plant_entry)
+        '''Layout the widgets in the content frame'''
         trv.grid(row=1,column=1,padx=20,pady=20)
         # Vertical scrollbar widget layout
         vs = ttk.Scrollbar(contentframe1,orient='vertical',command=trv.yview)
@@ -175,6 +184,8 @@ def menu_select(size,image,image_resize):
             else:
                 trv.insert("", END, iid=row[0], text=row[1], values=df_list, tags=('oddrow',))
             df_list = []
+        btn_select_record.grid(row=3, column=0, columnspan=2,pady=20, sticky='s')
+
     def add_plant():
         clearFrame() # clear out contentframe1 contents
         # declaring string variables for storing values of entry form

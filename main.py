@@ -5,19 +5,30 @@ by : jahascow
 
 Module About:
     This file is for processing of plant specific data.
-    want to create color pallet dictionary for use within this app
     next to add is data entry form for logs with option selector for plant (optional?)
 """
 # Native
 import os
 import os.path
 import pandas as pd
+import subprocess
 
 # 3rd-Party
 from tkinter import *
 from tkinter import Tk,ttk
 from PIL import Image, ImageTk
+import fpdf
 
+color_pallet_dict = {
+    1: '#e6ffe6',
+    2: '#ebd9c6',
+    3: '#f8f2ec',
+    4: [247, 247, 247], # string rgb color for greyish
+    5: [255, 255, 255], # string rgb color for white
+    6: [42,158,255], # string rgb color for blue
+    7: '#71A57B', # in place of green
+    8: '#ffffff' # in place of white
+}
 example_plant_entry_dict = {
     'Plant category': ['Examples'],
     'Plant name': ['Broccoli'], # 'Broccoli'
@@ -36,7 +47,6 @@ example_plant_entry_dict = {
     'Number of plants per space': [1], # 1
     'Other notes': [''] # eg determinate or whatever
 }
-
 # index of data columns for storageof plant data for item index reference
 plant_config_dict = {
     0: 'Plant category', # Vegetables, Fruits
@@ -56,7 +66,6 @@ plant_config_dict = {
     14: 'Number of plants per space', # 1
     15: 'Other notes' # eg determinate or whatever
 }
-
 class Plants():
     def refresh_plant_object(self):
         self.plant_df = pd.read_csv(self.plant_df_file)
@@ -73,6 +82,63 @@ class Plants():
             self.plant_df_cur_index = self.plant_df['Plant index'].max()
     def __str__(self):
         return 'Plants Object: Example -> ' + str(self.plant_df['Plant name'][0])
+    def create_pdf(self):
+        pdf_file = os.path.join(os.path.dirname(__file__), str('plant_index.pdf'))
+        pdf = fpdf.FPDF()
+        pdf.add_page()        
+        # Set the font
+        pdf.set_font("Times", size=14, style="B")
+        # Define the table data
+        data = plants_obj.plant_df[['Plant index','Plant category','Plant name','Plant variety',]]
+        # Calculate the effective page width
+        epw = pdf.w - 2 * pdf.l_margin
+        # Text height is the same as current font size
+        th = pdf.font_size
+        # Draw the table headers
+        pdf.set_fill_color(color_pallet_dict[6][0],color_pallet_dict[6][1],color_pallet_dict[6][2])  # Set the fill color to blue
+        pdf.set_text_color(color_pallet_dict[5][0],color_pallet_dict[5][1],color_pallet_dict[5][2])  # Set text color to white
+        # Setup scope level variables
+        col_width = 0
+        col_width2 = 0
+        col_width3 = 0
+        col_width4 = 0
+        for key,row in enumerate(data):
+            if key == 0:
+                col_width = 27
+                pdf.cell(col_width, th, str(row), border=1, fill=True)
+            elif key == 1:
+                col_width2=int((epw - 27)/3)-20
+                pdf.cell(col_width2, th, str(row), border=1, fill=True)
+            elif key == 2:
+                col_width3=col_width4=int((epw - 27)/3)+10
+                pdf.cell(col_width3, th, str(row), border=1, fill=True)                
+            else:
+                col_width3=col_width4=int((epw - 27)/3)+10
+                pdf.cell(col_width4, th, str(row), border=1, fill=True)             
+        #Create new line after header
+        pdf.ln(th)
+
+        # Iterating over rows to populate table data
+        pdf.set_font("Times", size=12)
+        th=pdf.font_size
+        pdf.set_text_color(0, 0, 0)  # Set text color to 
+        for index, row in data.iterrows():
+            if index % 2 != 0:
+                pdf.set_fill_color(color_pallet_dict[4][0],color_pallet_dict[4][1],color_pallet_dict[4][2])  # Set the fill color to greyish
+            else:
+                pdf.set_fill_color(color_pallet_dict[5][0],color_pallet_dict[5][1],color_pallet_dict[5][2])  # Set the fill color to white
+            
+            pdf.cell(col_width,th,str(row['Plant index']),border=0, fill=True)
+            pdf.cell(col_width2,th,str(row['Plant category']),border=0, fill=True)
+            pdf.cell(col_width3,th,str(row['Plant name']),border=0, fill=True)
+            pdf.cell(col_width4,th,str(row['Plant variety']),border=0, fill=True)
+            pdf.ln(th)
+        pdf.ln(th)
+        pdf.set_y(0)
+        pdf.cell(0, 10, 'Garden Planner & Tracker by Jahascow', 0, 0, 'C')
+        pdf.output(pdf_file, 'F')
+        subprocess.Popen([pdf_file],shell=True)
+        
     def plant_csv_update(self):
         if self.file_check == True:
             # Append the new data to the existing DataFrame
@@ -143,14 +209,15 @@ def menu_select(size,image,image_resize):
         # Add Some Style
         style = ttk.Style() 
         # Change Selected Color
-        style.map('Treeview', background=[('selected', "green")]) 
+        style.map('Treeview', background=[('selected', color_pallet_dict[7])]) 
         # Configure the Treeview Colors
         style.configure("Treeview",
-            background="#e6ffe6",
+            background=color_pallet_dict[1],
             foreground="black",
             rowheight=25,
-            fieldbackground="#e6ffe6")
-        btn_select_record = Button(contentframe1, text="View Selected", font=("TkDefaultFont",10,'bold'), background='green', fg='white', command=view_plant_entry)
+            fieldbackground=color_pallet_dict[1])
+        btn_select_record = Button(contentframe1, text="View Selected", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_plant_entry)
+        btn_create_plant_pdf = Button(contentframe1, text="Plant Index PDF", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
         '''Layout the widgets in the content frame'''
         trv.grid(row=1,column=1,padx=20,pady=20)
         # Vertical scrollbar widget layout
@@ -184,7 +251,8 @@ def menu_select(size,image,image_resize):
             else:
                 trv.insert("", END, iid=row[0], text=row[1], values=df_list, tags=('oddrow',))
             df_list = []
-        btn_select_record.grid(row=3, column=0, columnspan=2,pady=20, sticky='s')
+        btn_select_record.grid(row=3, column=1, columnspan=2, padx=20, pady=20, sticky='s')
+        btn_create_plant_pdf.grid(row=3, column=1, columnspan=2, padx=20, pady=20, sticky='se')
 
     def add_plant():
         clearFrame() # clear out contentframe1 contents
@@ -256,22 +324,22 @@ def menu_select(size,image,image_resize):
             text_other_notes.delete('1.0', END)
         '''Create the widgets for the contentframe1'''
         # First all the labels
-        label_plant_category = Label(contentframe1, text = 'Plant category:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_plant_name = Label(contentframe1, text = 'Plant name:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_plant_variety = Label(contentframe1, text = 'Plant variety:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_germination_start = Label(contentframe1, text = 'Germination start:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_germination_end = Label(contentframe1, text = 'Germination end:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_maturity_start = Label(contentframe1, text = 'Maturity start:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_maturity_end = Label(contentframe1, text = 'Maturity end:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_genetics_1 = Label(contentframe1, text = 'Genetics 1:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_genetics_2 = Label(contentframe1, text = 'Genetics 2:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_genetics_3 = Label(contentframe1, text = 'Genetics 3:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_plant_depth_min = Label(contentframe1, text = 'Plant depth min:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_plant_depth_max = Label(contentframe1, text = 'Plant depth max:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_plant_spacing_min = Label(contentframe1, text = 'Plant spacing min:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_plant_spacing_max = Label(contentframe1, text = 'Plant spacing max:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_number_of_plants_per_space = Label(contentframe1, text = 'Number of plants per space:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
-        label_other_notes = Label(contentframe1, text = 'Other notes:', background="#f8f2ec", font=("TkDefaultFont",10,'bold'))
+        label_plant_category = Label(contentframe1, text = 'Plant category:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_name = Label(contentframe1, text = 'Plant name:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_variety = Label(contentframe1, text = 'Plant variety:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_germination_start = Label(contentframe1, text = 'Germination start:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_germination_end = Label(contentframe1, text = 'Germination end:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_maturity_start = Label(contentframe1, text = 'Maturity start:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_maturity_end = Label(contentframe1, text = 'Maturity end:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_genetics_1 = Label(contentframe1, text = 'Genetics 1:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_genetics_2 = Label(contentframe1, text = 'Genetics 2:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_genetics_3 = Label(contentframe1, text = 'Genetics 3:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_depth_min = Label(contentframe1, text = 'Plant depth min:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_depth_max = Label(contentframe1, text = 'Plant depth max:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_spacing_min = Label(contentframe1, text = 'Plant spacing min:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_spacing_max = Label(contentframe1, text = 'Plant spacing max:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_number_of_plants_per_space = Label(contentframe1, text = 'Number of plants per space:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_other_notes = Label(contentframe1, text = 'Other notes:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
         
         # Next all the entry fields
         entry_plant_category = Entry(contentframe1,textvariable=var_plant_category, width=70, font=("TkDefaultFont",10,'normal'))
@@ -292,7 +360,7 @@ def menu_select(size,image,image_resize):
         text_other_notes = Text(contentframe1, width=70, height=3, font=("TkDefaultFont",10,'normal'))
         
         # Submit Plant Button
-        btn_submit = Button(contentframe1,text = 'Submit Plant Entry', font=("TkDefaultFont",10,'bold'), background='green', fg='white', command = submit)
+        btn_submit = Button(contentframe1,text = 'Submit Plant Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
         
         '''Layout the widgets in the buttonsframe'''
         contentframe1.grid(row=0,column=1,padx=0,pady=0)
@@ -414,11 +482,11 @@ def menu_select(size,image,image_resize):
     root = Tk() 
     root.title('Garden Planner & Tracker:: Main Menu: by jahascow') 
     root.geometry(size)
-    root.configure(background='#e6ffe6')
+    root.configure(background=color_pallet_dict[1])
 
     '''Create all of the main containers'''
-    buttonsframe= Frame(root, bg='#ebd9c6', width=145, height=600)
-    contentframe1 = Frame(root, bg="#f8f2ec", width=550, height=600)#)
+    buttonsframe= Frame(root, bg=color_pallet_dict[2], width=145, height=600)
+    contentframe1 = Frame(root, bg=color_pallet_dict[3], width=550, height=600)#)
 
     '''Layout all of the main containers'''
     root.grid_columnconfigure(0, weight=0)
@@ -433,7 +501,7 @@ def menu_select(size,image,image_resize):
     image = Image.open(image)
     resized_image = image.resize(image_resize)
     img = ImageTk.PhotoImage(resized_image) # Convert the resized image for Tkinter
-    image_label = Label(buttonsframe, image=img, background='#ebd9c6') # Create a label and assign image
+    image_label = Label(buttonsframe, image=img, background=color_pallet_dict[2]) # Create a label and assign image
     image_label.image = img  # Keep a reference to avoid garbage collection
     # Show plants widget
     showplants_button = Button(buttonsframe, text='Show Plants', font=("TkDefaultFont",10,'bold'),
@@ -442,7 +510,7 @@ def menu_select(size,image,image_resize):
     addplant_button = Button(buttonsframe, text='Add Plant', font=("TkDefaultFont",10,'bold'),
                            command=add_plant) #,anchor='w', justify='left',
     # Exit widget
-    exit_button = Button(buttonsframe, text="Exit", font=("TkDefaultFont",10,'bold'), bg='green', fg='white', command=shutdown_app)    
+    exit_button = Button(buttonsframe, text="Exit", font=("TkDefaultFont",10,'bold'), bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=shutdown_app)    
     
     '''Layout the widgets in the buttonsframe'''
     image_label.grid(row=0, column=0)

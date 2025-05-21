@@ -198,6 +198,8 @@ def menu_select(size,image,image_resize):
         for widget in contentframe1.winfo_children():
             widget.destroy()
         contentframe1.pack_forget()
+    def log_selected_entry(plant):
+        print(plant)
     def view_plant_entry(plant):
         clearFrame()
         # declaring string variables for storing values of entry form
@@ -430,6 +432,14 @@ def menu_select(size,image,image_resize):
                 view_plant_entry(trv.item(selected_item, 'values'))
             else:
                 print("No row selected")
+        def log_selected():
+            # Get the currently selected item
+            selected_item = trv.selection()
+            if selected_item:
+                # Get the values of the selected item
+                log_selected_entry(trv.item(selected_item, 'values'))
+            else:
+                print("No row selected")
         display_df = plants_obj.plant_df#.drop(columns=['Plant category', 'Genetics 1'])
         # Buttoms frame for content frame 
         contentframe1_buttons_frame = Frame(contentframe1, bg=color_pallet_dict[3], width=550, height=100)
@@ -448,7 +458,8 @@ def menu_select(size,image,image_resize):
             foreground="black",
             rowheight=25,
             fieldbackground=color_pallet_dict[1])
-        btn_select_record = Button(contentframe1_buttons_frame, text="View Selected", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
+        btn_select_record = Button(contentframe1_buttons_frame, text="View Plant", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
+        btn_log_selected = Button(contentframe1_buttons_frame, text="Plant Log Entry", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=log_selected)
         btn_create_plant_pdf = Button(contentframe1_buttons_frame, text="Plant Index PDF", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
         '''Layout the widgets in the content frame'''
         contentframe1_buttons_frame.grid(column=1, columnspan=3, row=3, padx=0, pady=0, sticky='ESW')
@@ -487,7 +498,8 @@ def menu_select(size,image,image_resize):
                 trv.insert("", END, iid=row[0], text=row[1], values=df_list, tags=('oddrow',))
             df_list = []
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
-        btn_create_plant_pdf.grid(row=3, column=1, padx=20, pady=20, sticky='se')
+        btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
+        btn_create_plant_pdf.grid(row=3, column=3, padx=20, pady=20, sticky='s')
     def add_plant():
         clearFrame() # clear out contentframe1 contents
         # declaring string variables for storing values of entry form

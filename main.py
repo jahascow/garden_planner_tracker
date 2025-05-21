@@ -168,7 +168,14 @@ class Plants():
         }
         self.plant_df_new = pd.DataFrame(data_temp)
     def plant_update(self,submit_results):
-        print('adjust here, configure plants object record update')
+        # Update record of the existing DataFrame
+        data = self.plant_df
+        data.loc[data['Plant index'] == int(submit_results[0])] = submit_results
+        self.plant_df = data
+        # Write the updated DataFrame back to the CSV file
+        self.plant_df.to_csv(self.plant_df_file, index=False)
+        # refresh plant object
+        self.refresh_plant_object()        
     def plant_entry(self,submit_results):
         # now we need to build a dataframe dictionary with these variables 
         print(self.plant_df_cur_index+1,submit_results)
@@ -193,7 +200,6 @@ def menu_select(size,image,image_resize):
         contentframe1.pack_forget()
     def view_plant_entry(plant):
         clearFrame()
-        print(plant)
         # declaring string variables for storing values of entry form
         var_plant_category = StringVar(contentframe1)
         var_plant_name = StringVar(contentframe1)
@@ -236,16 +242,12 @@ def menu_select(size,image,image_resize):
                 int(maturity_end),str(genetics_1),str(genetics_2),str(genetics_3),\
                 float(plant_depth_min),float(plant_depth_max),float(plant_spacing_min),\
                 float(plant_spacing_max),int(number_of_plants_per_space),str(other_notes)]
-            print('adjust here, need to send to plants object to new method for updating record.')
             plants_obj.plant_update(submit_results)
-            # use below to populate default values for the form vs past results
-            populate_defaults()
         def populate_defaults():
             # ways to repopulate form values after submit if desired
             #var_plant_category.set("jenga")
             #var_plant_name.set("")
             #var_plant_variety.set(plant_variety)
-            print('adjust here 2, maybe add id as immutable display field')
             var_plant_category.set(plant[1])
             var_plant_name.set(plant[2])
             var_plant_variety.set(plant[3])
@@ -300,7 +302,7 @@ def menu_select(size,image,image_resize):
         text_other_notes = Text(contentframe1, width=70, height=3, font=("TkDefaultFont",10,'normal'))
         
         # Submit Plant Button
-        btn_submit = Button(contentframe1,text = 'Update Plant Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
+        btn_submit = Button(contentframe1,text = f'Update Plant Entry, plant index #{plant[0]}', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
         
         '''Layout the widgets in the buttonsframe'''
         contentframe1.grid(row=0,column=1,padx=0,pady=0)

@@ -3,13 +3,11 @@ Plant index,Plant category,Plant name,Plant variety,Germination start,Germinatio
 2,Fruits,Tomato,Baxter's Bush Cherry,7,10,0,0,Heirloom,Annual,Full Sun,0.25,0.25,36,36,1,determinate
 3,Vegetables,Tomato,Roma,7,10,80,90,Hybrid,Annual,Full Sun,0.25,0.25,24,36,1,determinate
 4,Vegetables,Pepperoncini,Greek Hot Pepper,10,21,0,65,Heirloom,Annual,Full Sun,0.25,0.25,18,24,1,none
-5,Herbs,Rosemary,Rosemary,14,21,90,400,Heirloom,Perennial,Full Sun,0.25,0.25,18,18,3,"none
-
-"
+5,Herbs,Rosemary,Rosemary,14,21,90,400,Heirloom,Perennial,Full Sun,0.25,0.25,18,18,3,none
 6,Vegetables,Tomato,San Marzano,0,0,80,80,Heirloom,Annual,Full Sun,0.25,0.25,24,24,1,Indeterminate
 7,Herbs,Error,Update soon,14,21,90,400,Heirloom,Perennial,Full Sun,0.25,0.25,18,18,3,"nones
 "
-8,Vegetables,Squash,Yellow Summer CrookNeck,7,10,53,53,Heirloom,Annual,Full Sun,1.0,1.0,36,48,3,none
+8,Vegetables,Squash,Yellow Summer CrookNeck,7,10,53,53,Heirloom,Annual,Full Sun,1,1,36,48,3,none
 9,Vegetables,Carrot,Imperator 58,0,0,68,68,Heirloom,Annual,Partial Sun,0.13,0.25,2,2,1,"roughly 9"" deep orange carrot "
 10,Vegetables,Lettuce,Green Salad Bowl Lactuca Sativa,0,0,45,50,Heirloom,Annual,Partial Sun,0.13,0.13,8,10,1,none
 11,Vegetables,Beet,"Detroit Dark Red, Medium Top",14,21,59,59,Heirloom,Annual,Full Sun,0.5,0.5,3,12,1,none
@@ -17,7 +15,7 @@ Plant index,Plant category,Plant name,Plant variety,Germination start,Germinatio
 13,Herbs,Basil,Basil,0,0,0,0,Heirloom,Annual,Full Sun,0.25,0.25,1,3,1,"soak seeds in water for 12-24 hours to expedite germination
 "
 14,Vegetables,Bush Bean,Blue Lake,0,0,55,55,Heirloom,Annual,"Full Sun, Partial Sun",0.5,0.5,3,3,1,none
-15,Vegetables,Bush Bean,Topnotch Golden Wax,8,16,50,65,Heirloom,Annual,Full Sun,2.0,2.0,2,3,1,"can succession plant these
+15,Vegetables,Bush Bean,Topnotch Golden Wax,8,16,50,65,Heirloom,Annual,Full Sun,2,2,2,3,1,"can succession plant these
 "
 16,Vegetables,Marigold,Happy Days Mixed Colors,7,14,60,70,Heirloom,Annual,Full Sun,0.25,0.25,9,12,1,none
 17,Herbs,Thyme,Common (Thymus Vulgaris),8,20,80,85,Heirloom,Perennial,Full Sun,0.25,0.25,8,8,1,none
@@ -26,5 +24,5 @@ Plant index,Plant category,Plant name,Plant variety,Germination start,Germinatio
 "
 20,Vegetables,Tomato,Cherokee Purple,7,10,82,82,Heirloom,Annual,Full Sun,0.25,0.25,24,24,1,none
 21,Herbs,Fenugreek,Fenugreek,0,0,30,30,Heirloom,Perennial,Full Sun,0.25,0.25,6,6,1,none
-22,Herbs,Chicory,Oasis,0,0,45,50,Heirloom,Perennial,"Full Sun, Partial Sun",1.0,1.0,12,12,1,none
-23,Vegetables,Pea,Oregon Sugar Pod II,7,14,68,68,Heirloom,Annual,Full Sun,1.0,1.0,4,6,1,none
+22,Herbs,Chicory,Oasis,0,0,45,50,Heirloom,Perennial,"Full Sun, Partial Sun",1,1,12,12,1,none
+23,Vegetables,Pea,Oregon Sugar Pod II,7,14,68,68,Heirloom,Annual,Full Sun,1,1,4,6,1,none

@@ -190,17 +190,21 @@ def menu_select(size,image,image_resize):
         for widget in contentframe1.winfo_children():
             widget.destroy()
         contentframe1.pack_forget()
+    def view_plant_entry(plant):
+        print(plant)
     def show_plants():
         clearFrame() # clear out contentframe1 contents
-        def view_plant_entry():
+        def view_selected():
             # Get the currently selected item
             selected_item = trv.selection()
             if selected_item:
                 # Get the values of the selected item
-                item_values = trv.item(selected_item, 'values')
+                view_plant_entry(trv.item(selected_item, 'values'))
             else:
                 print("No row selected")
         display_df = plants_obj.plant_df#.drop(columns=['Plant category', 'Genetics 1'])
+        # Buttoms frame for content frame 
+        contentframe1_buttons_frame = Frame(contentframe1, bg=color_pallet_dict[3], width=550, height=100)
         # Content Frame
         '''Create the widgets for the contentframe1'''
         # Create a Treeview widget
@@ -216,9 +220,12 @@ def menu_select(size,image,image_resize):
             foreground="black",
             rowheight=25,
             fieldbackground=color_pallet_dict[1])
-        btn_select_record = Button(contentframe1, text="View Selected", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_plant_entry)
-        btn_create_plant_pdf = Button(contentframe1, text="Plant Index PDF", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
+        btn_select_record = Button(contentframe1_buttons_frame, text="View Selected", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
+        btn_create_plant_pdf = Button(contentframe1_buttons_frame, text="Plant Index PDF", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
         '''Layout the widgets in the content frame'''
+        contentframe1_buttons_frame.grid(column=1, columnspan=3, row=3, padx=0, pady=0, sticky='ESW')
+        contentframe1_buttons_frame.rowconfigure(1,weight=1)
+        contentframe1_buttons_frame.columnconfigure(1,weight=3)
         trv.grid(row=1,column=1,padx=20,pady=20)
         # Vertical scrollbar widget layout
         vs = ttk.Scrollbar(contentframe1,orient='vertical',command=trv.yview)
@@ -251,8 +258,8 @@ def menu_select(size,image,image_resize):
             else:
                 trv.insert("", END, iid=row[0], text=row[1], values=df_list, tags=('oddrow',))
             df_list = []
-        btn_select_record.grid(row=3, column=1, columnspan=2, padx=20, pady=20, sticky='s')
-        btn_create_plant_pdf.grid(row=3, column=1, columnspan=2, padx=20, pady=20, sticky='se')
+        btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
+        btn_create_plant_pdf.grid(row=3, column=1, padx=20, pady=20, sticky='se')
 
     def add_plant():
         clearFrame() # clear out contentframe1 contents

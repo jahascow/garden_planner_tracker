@@ -137,9 +137,8 @@ class Plants():
         pdf.set_y(0)
         pdf.cell(0, 10, 'Garden Planner & Tracker by Jahascow', 0, 0, 'C')
         pdf.output(pdf_file, 'F')
-        subprocess.Popen([pdf_file],shell=True)
-        
-    def plant_csv_update(self):
+        subprocess.Popen([pdf_file],shell=True) 
+    def plant_csv_insert(self):
         if self.file_check == True:
             # Append the new data to the existing DataFrame
             self.plant_df = pd.concat([self.plant_df, self.plant_df_new], ignore_index=False)
@@ -168,12 +167,14 @@ class Plants():
             'Other notes': [submit_results[15]] # eg determinate
         }
         self.plant_df_new = pd.DataFrame(data_temp)
+    def plant_update(self,submit_results):
+        print('adjust here, configure plants object record update')
     def plant_entry(self,submit_results):
         # now we need to build a dataframe dictionary with these variables 
         print(self.plant_df_cur_index+1,submit_results)
         self.make_plant_df(self.plant_df_cur_index+1,submit_results)
         # now we need to save / append to existing data & datafile
-        self.plant_csv_update()
+        self.plant_csv_insert()
         # refresh plant object
         self.refresh_plant_object()
         
@@ -191,7 +192,232 @@ def menu_select(size,image,image_resize):
             widget.destroy()
         contentframe1.pack_forget()
     def view_plant_entry(plant):
+        clearFrame()
         print(plant)
+        # declaring string variables for storing values of entry form
+        var_plant_category = StringVar(contentframe1)
+        var_plant_name = StringVar(contentframe1)
+        var_plant_variety = StringVar(contentframe1)
+        var_germination_start = StringVar(contentframe1)
+        var_germination_end = StringVar(contentframe1)
+        var_maturity_start = StringVar(contentframe1)
+        var_maturity_end = StringVar(contentframe1)
+        var_genetics_1 = StringVar(contentframe1)
+        var_genetics_2 = StringVar(contentframe1)
+        var_genetics_3 = StringVar(contentframe1)
+        var_plant_depth_min = StringVar(contentframe1)
+        var_plant_depth_max = StringVar(contentframe1)
+        var_plant_spacing_min = StringVar(contentframe1)
+        var_plant_spacing_max = StringVar(contentframe1)
+        var_number_of_plants_per_space = StringVar(contentframe1)
+        text_other_notes = StringVar(contentframe1)
+        def submit():
+            # form variables return values
+            plant_category = var_plant_category.get()
+            plant_name = var_plant_name.get()
+            plant_variety = var_plant_variety.get()
+            germination_start = var_germination_start.get()
+            germination_end = var_germination_end.get()
+            maturity_start = var_maturity_start.get()
+            maturity_end = var_maturity_end.get()
+            genetics_1 = var_genetics_1.get()
+            genetics_2 = var_genetics_2.get()
+            genetics_3 = var_genetics_3.get()
+            plant_depth_min = var_plant_depth_min.get()
+            plant_depth_max = var_plant_depth_max.get()
+            plant_spacing_min = var_plant_spacing_min.get()
+            plant_spacing_max = var_plant_spacing_max.get()
+            number_of_plants_per_space = var_number_of_plants_per_space.get()
+            other_notes = text_other_notes.get('1.0',END) # differs from entry
+            if len(other_notes) < 2:
+                other_notes = 'none'
+            submit_results = [plant[0],str(plant_category),str(plant_name),str(plant_variety),\
+                int(germination_start),int(germination_end),int(maturity_start),\
+                int(maturity_end),str(genetics_1),str(genetics_2),str(genetics_3),\
+                float(plant_depth_min),float(plant_depth_max),float(plant_spacing_min),\
+                float(plant_spacing_max),int(number_of_plants_per_space),str(other_notes)]
+            print('adjust here, need to send to plants object to new method for updating record.')
+            plants_obj.plant_update(submit_results)
+            # use below to populate default values for the form vs past results
+            populate_defaults()
+        def populate_defaults():
+            # ways to repopulate form values after submit if desired
+            #var_plant_category.set("jenga")
+            #var_plant_name.set("")
+            #var_plant_variety.set(plant_variety)
+            print('adjust here 2, maybe add id as immutable display field')
+            var_plant_category.set(plant[1])
+            var_plant_name.set(plant[2])
+            var_plant_variety.set(plant[3])
+            var_germination_start.set(plant[4])
+            var_germination_end.set(plant[5])
+            var_maturity_start.set(plant[6])
+            var_maturity_end.set(plant[7])
+            var_genetics_1.set(plant[8])
+            var_genetics_2.set(plant[9])
+            var_genetics_3.set(plant[10])
+            var_plant_depth_min.set(plant[11])
+            var_plant_depth_max.set(plant[12])
+            var_plant_spacing_min.set(plant[13])
+            var_plant_spacing_max.set(plant[14])
+            var_number_of_plants_per_space.set(plant[15])
+            text_other_notes.insert('1.0', plant[16], END)
+        '''Create the widgets for the contentframe1'''
+        # First all the labels
+        label_plant_category = Label(contentframe1, text = 'Plant category:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_name = Label(contentframe1, text = 'Plant name:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_variety = Label(contentframe1, text = 'Plant variety:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_germination_start = Label(contentframe1, text = 'Germination start:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_germination_end = Label(contentframe1, text = 'Germination end:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_maturity_start = Label(contentframe1, text = 'Maturity start:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_maturity_end = Label(contentframe1, text = 'Maturity end:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_genetics_1 = Label(contentframe1, text = 'Genetics 1:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_genetics_2 = Label(contentframe1, text = 'Genetics 2:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_genetics_3 = Label(contentframe1, text = 'Genetics 3:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_depth_min = Label(contentframe1, text = 'Plant depth min:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_depth_max = Label(contentframe1, text = 'Plant depth max:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_spacing_min = Label(contentframe1, text = 'Plant spacing min:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_plant_spacing_max = Label(contentframe1, text = 'Plant spacing max:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_number_of_plants_per_space = Label(contentframe1, text = 'Number of plants per space:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_other_notes = Label(contentframe1, text = 'Other notes:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        
+        # Next all the entry fields
+        entry_plant_category = Entry(contentframe1,textvariable=var_plant_category, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_plant_name = Entry(contentframe1,textvariable=var_plant_name, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_plant_variety = Entry(contentframe1,textvariable=var_plant_variety, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_germination_start = Entry(contentframe1,textvariable=var_germination_start, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_germination_end = Entry(contentframe1,textvariable=var_germination_end, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_maturity_start = Entry(contentframe1,textvariable=var_maturity_start, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_maturity_end = Entry(contentframe1,textvariable=var_maturity_end, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_genetics_1 = Entry(contentframe1,textvariable=var_genetics_1, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_genetics_2 = Entry(contentframe1,textvariable=var_genetics_2, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_genetics_3 = Entry(contentframe1,textvariable=var_genetics_3, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_plant_depth_min = Entry(contentframe1,textvariable=var_plant_depth_min, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_plant_depth_max = Entry(contentframe1,textvariable=var_plant_depth_max, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_plant_spacing_min = Entry(contentframe1,textvariable=var_plant_spacing_min, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_plant_spacing_max = Entry(contentframe1,textvariable=var_plant_spacing_max, width=70, font=("TkDefaultFont",10,'normal'))
+        entry_number_of_plants_per_space = Entry(contentframe1,textvariable=var_number_of_plants_per_space, width=70, font=("TkDefaultFont",10,'normal'))
+        text_other_notes = Text(contentframe1, width=70, height=3, font=("TkDefaultFont",10,'normal'))
+        
+        # Submit Plant Button
+        btn_submit = Button(contentframe1,text = 'Update Plant Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
+        
+        '''Layout the widgets in the buttonsframe'''
+        contentframe1.grid(row=0,column=1,padx=0,pady=0)
+        contentframe1.grid_columnconfigure(0, weight=0)
+        contentframe1.grid_columnconfigure(1, weight=3)
+        
+        '''Layout the widgets in the content1frame'''
+        # label widgets
+        label_plant_category.grid(row=0,column=0, padx=5, pady=5, sticky='e')
+        label_plant_name.grid(row=1,column=0, padx=5, pady=5, sticky='e')
+        label_plant_variety.grid(row=2,column=0, padx=5, pady=5, sticky='e')   
+        label_germination_start.grid(row=3,column=0, padx=5, pady=5, sticky='e') 
+        label_germination_end.grid(row=4,column=0, padx=5, pady=5, sticky='e') 
+        label_maturity_start.grid(row=5,column=0, padx=5, pady=5, sticky='e') 
+        label_maturity_end.grid(row=6,column=0, padx=5, pady=5, sticky='e') 
+        label_genetics_1.grid(row=7,column=0, padx=5, pady=5, sticky='e') 
+        label_genetics_2.grid(row=8,column=0, padx=5, pady=5, sticky='e') 
+        label_genetics_3.grid(row=9,column=0, padx=5, pady=5, sticky='e') 
+        label_plant_depth_min.grid(row=10,column=0, padx=5, pady=5, sticky='e') 
+        label_plant_depth_max.grid(row=11,column=0, padx=5, pady=5, sticky='e') 
+        label_plant_spacing_min.grid(row=12,column=0, padx=5, pady=5, sticky='e') 
+        label_plant_spacing_max.grid(row=13,column=0, padx=5, pady=5, sticky='e') 
+        label_number_of_plants_per_space.grid(row=14,column=0, padx=5, pady=5, sticky='e') 
+        label_other_notes.grid(row=15,column=0, padx=5, pady=5, sticky='ne') 
+        # entry widgets      
+        entry_plant_category.grid(row=0,column=1, padx=5, pady=5)
+        entry_plant_name.grid(row=1,column=1, padx=5, pady=5)
+        entry_plant_variety.grid(row=2,column=1, padx=5, pady=5)
+        entry_germination_start.grid(row=3,column=1, padx=5, pady=5)
+        entry_germination_end.grid(row=4,column=1, padx=5, pady=5)
+        entry_maturity_start.grid(row=5,column=1, padx=5, pady=5)
+        entry_maturity_end.grid(row=6,column=1, padx=5, pady=5)
+        entry_genetics_1.grid(row=7,column=1, padx=5, pady=5)
+        entry_genetics_2.grid(row=8,column=1, padx=5, pady=5)
+        entry_genetics_3.grid(row=9,column=1, padx=5, pady=5)
+        entry_plant_depth_min.grid(row=10,column=1, padx=5, pady=5)
+        entry_plant_depth_max.grid(row=11,column=1, padx=5, pady=5)
+        entry_plant_spacing_min.grid(row=12,column=1, padx=5, pady=5)
+        entry_plant_spacing_max.grid(row=13,column=1, padx=5, pady=5)
+        entry_number_of_plants_per_space.grid(row=14,column=1, padx=5, pady=5)
+        text_other_notes.grid(row=15,column=1, padx=5, pady=5)
+        
+        '''Tooltips Configuration'''
+        # Each tip seems to require its own functions and variables as
+        # I do not know a way to handle a function inside a window that
+        # must be passed as an object for the purpose of tkinter.
+        
+        # tooltip labels
+        tip_plant_category = ttk.Label(contentframe1, text="Enter plant category:\neg; Vegetables, Fruits", background='light yellow')
+        tip_plant_name = ttk.Label(contentframe1, text="Enter plant name:\neg; Broccoli, Carrot, Marigold", background='light yellow')
+        tip_plant_variety = ttk.Label(contentframe1, text="Enter plant variety:\neg; Waltham 29, Baxter Bush", background='light yellow')
+        tip_plant_depth_min = ttk.Label(contentframe1, text="Unit in inches floating decimal", background='light yellow')
+        tip_plant_depth_max = ttk.Label(contentframe1, text="Unit in inches floating decimal", background='light yellow')
+        tip_plant_spacing_min = ttk.Label(contentframe1, text="Unit in inches floating decimal", background='light yellow')
+        tip_plant_spacing_max = ttk.Label(contentframe1, text="Unit in inches floating decimal", background='light yellow')
+
+        # tooltip show functions     
+        def show_tooltip_plant_category(event): 
+            tip_plant_category.place(anchor='nw', relx=0.2, rely=0.0)
+            tip_plant_category.lift(aboveThis=None)
+        def show_tooltip_plant_name(event): 
+            tip_plant_name.place(anchor='nw', relx=0.2, rely=0.03)#, width=400, height=200)#(x=root.winfo_pointerx(), y=root.winfo_pointery()) # need relative numbers though not exact returns
+            tip_plant_name.lift(aboveThis=None)            
+        def show_tooltip_plant_variety(event): 
+            tip_plant_variety.place(anchor='nw', relx=0.2, rely=0.06)
+            tip_plant_variety.lift(aboveThis=None)
+        def show_tooltip_plant_depth_min(event): 
+            tip_plant_depth_min.place(anchor='nw', relx=0.2, rely=0.30)
+            tip_plant_depth_min.lift(aboveThis=None)
+        def show_tooltip_plant_depth_max(event): 
+            tip_plant_depth_max.place(anchor='nw', relx=0.2, rely=0.33)
+            tip_plant_depth_max.lift(aboveThis=None)
+        def show_tooltip_plant_spacing_min(event): 
+            tip_plant_spacing_min.place(anchor='nw', relx=0.2, rely=0.36)
+            tip_plant_spacing_min.lift(aboveThis=None)
+        def show_tooltip_plant_spacing_max(event): 
+            tip_plant_spacing_max.place(anchor='nw', relx=0.2, rely=0.39)
+            tip_plant_spacing_max.lift(aboveThis=None)
+                        
+        # tooltip hide functions
+        def hide_tooltip_plant_category(event): 
+            tip_plant_category.place_forget()
+        def hide_tooltip_plant_name(event): 
+            tip_plant_name.place_forget()
+        def hide_tooltip_plant_variety(event): 
+            tip_plant_variety.place_forget()
+        def hide_tooltip_plant_depth_min(event): 
+            tip_plant_depth_min.place_forget()
+        def hide_tooltip_plant_depth_max(event): 
+            tip_plant_depth_max.place_forget()
+        def hide_tooltip_plant_spacing_min(event): 
+            tip_plant_spacing_min.place_forget()
+        def hide_tooltip_plant_spacing_max(event): 
+            tip_plant_spacing_max.place_forget()
+
+        # tooltip <Enter> label bindings
+        label_plant_name.bind("<Enter>", show_tooltip_plant_name)
+        label_plant_category.bind("<Enter>", show_tooltip_plant_category)
+        label_plant_variety.bind("<Enter>", show_tooltip_plant_variety)
+        label_plant_depth_min.bind("<Enter>", show_tooltip_plant_depth_min)
+        label_plant_depth_max.bind("<Enter>", show_tooltip_plant_depth_max)
+        label_plant_spacing_min.bind("<Enter>", show_tooltip_plant_spacing_min)
+        label_plant_spacing_max.bind("<Enter>", show_tooltip_plant_spacing_max)
+
+        # tooltip <Leave> label bindings
+        label_plant_name.bind("<Leave>", hide_tooltip_plant_name)
+        label_plant_category.bind("<Leave>", hide_tooltip_plant_category)
+        label_plant_variety.bind("<Leave>", hide_tooltip_plant_variety)        
+        label_plant_depth_min.bind("<Leave>", hide_tooltip_plant_depth_min)
+        label_plant_depth_max.bind("<Leave>", hide_tooltip_plant_depth_max)
+        label_plant_spacing_min.bind("<Leave>", hide_tooltip_plant_spacing_min)
+        label_plant_spacing_max.bind("<Leave>", hide_tooltip_plant_spacing_max)
+        
+        '''Form Submission'''
+        btn_submit.grid(row=16,column=0,columnspan=2,pady=20,sticky='s')
+        
+        populate_defaults()
     def show_plants():
         clearFrame() # clear out contentframe1 contents
         def view_selected():
@@ -260,7 +486,6 @@ def menu_select(size,image,image_resize):
             df_list = []
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_create_plant_pdf.grid(row=3, column=1, padx=20, pady=20, sticky='se')
-
     def add_plant():
         clearFrame() # clear out contentframe1 contents
         # declaring string variables for storing values of entry form

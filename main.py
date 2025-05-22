@@ -29,6 +29,15 @@ color_pallet_dict = {
     7: '#71A57B', # in place of green
     8: '#ffffff' # in place of white
 }
+example_log_entry_dict = {
+    'Log index': [''], # create log entry index id
+    'Plant index': [''], # the index of the plant referenced for log entry or blank for general log entry
+    'Topic': [''], # short entry for grouping topics freeform eg, transplant, direct sow, learning, informational
+    'Date': [''], # specify a date for this log entry
+    'Where': [''], # way to differentiate where an action for this log entry refers to; eg main garden, wicking tub
+    'Qty': [''], # if tracking of an amount of something done like planting of a tomato you can track how many
+    'Notes': [''] # open text for any information you want to log for future refrerence
+}
 example_plant_entry_dict = {
     'Plant category': ['Examples'],
     'Plant name': ['Broccoli'], # 'Broccoli'
@@ -70,9 +79,16 @@ class Plants():
     def refresh_plant_object(self):
         self.plant_df = pd.read_csv(self.plant_df_file)
         self.plant_df_cur_index = self.plant_df['Plant index'].max()
+    def refresh_log_object(self):
+        self.log_df = pd.read_csv(self.log_df_file)
+        self.log_df_cur_index = self.log_df['Log index'].max()
     def __init__(self):
+        # Setup plant and log dataframes / file checks
         self.plant_df_file = os.path.join(os.path.dirname(__file__), 'df', str('plants.csv'))
         self.file_check = os.path.isfile(self.plant_df_file)
+        self.log_df_file = os.path.join(os.path.dirname(__file__), 'df', str('log.csv'))
+        self.log_file_check = os.path.isfile(self.log_df_file)
+        # Establish dataframes from csv or example data
         if self.file_check == False: # File does not exist, create dataframe with test data
             self.plant_df = pd.DataFrame(example_plant_entry_dict)
             print('No plants defined.')
@@ -80,6 +96,13 @@ class Plants():
         else: # File exists load as a dataframe
             self.plant_df = pd.read_csv(self.plant_df_file)
             self.plant_df_cur_index = self.plant_df['Plant index'].max()
+        if self.log_file_check == False: # File does not exist, create dataframe with test data
+            self.log_df = pd.DataFrame(example_log_entry_dict)
+            print('No logs created.')
+            self.log_df_cur_index = 0
+        else: # File exists load as a dataframe
+            self.log_df = pd.read_csv(self.log_df_file)
+            self.log_df_cur_index = self.log_df['Log index'].max()
     def __str__(self):
         return 'Plants Object: Example -> ' + str(self.plant_df['Plant name'][0])
     def create_pdf(self):
@@ -199,6 +222,7 @@ def menu_select(size,image,image_resize):
             widget.destroy()
         contentframe1.pack_forget()
     def log_selected_entry(plant):
+        clearFrame()
         print(plant)
     def view_plant_entry(plant):
         clearFrame()

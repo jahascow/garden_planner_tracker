@@ -171,6 +171,14 @@ class Plants():
             self.plant_df.to_csv(self.plant_df_file, index=False)
         else:
             self.plant_df_new.to_csv(self.plant_df_file, index=False)
+    def log_csv_insert(self):
+        if self.log_file_check == True:
+            # Append the new data to the existing DataFrame
+            self.log_df = pd.concat([self.log_df, self.log_df_new], ignore_index=False)
+            # Write the updated DataFrame back to the CSV file
+            self.log_df.to_csv(self.log_df_file, index=False)
+        else:
+            self.log_df_new.to_csv(self.log_df_file, index=False)
     def make_plant_df(self,plant_index,submit_results):
         data_temp = {
             'Plant index': [plant_index],
@@ -204,7 +212,7 @@ class Plants():
             'Notes': [submit_results[6]] # open text for any information you want to log for future refrerence
 
         }
-        self.plant_df_new = pd.DataFrame(data_temp)
+        self.log_df_new = pd.DataFrame(data_temp)
     def plant_update(self,submit_results):
         # Update record of the existing DataFrame
         data = self.plant_df

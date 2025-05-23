@@ -118,14 +118,16 @@ class Plants():
             self.log_df_cur_index = self.log_df['Log index'].max()
     def __str__(self):
         return 'Plants Object: Example -> ' + str(self.plant_df['Plant name'][0])
-    def create_plant_log_pdf(self,plantsummary):
+    def create_plant_log_pdf(self,plantsummary,plantindex):
+        print(plantindex,type(plantindex))
         pdf_file = os.path.join(os.path.dirname(__file__), str('plant_log_index.pdf'))
         pdf = fpdf.FPDF()
         pdf.add_page()        
         # Set the font
         pdf.set_font("Times", size=14, style="B")
         # Define the table data
-        data = plants_obj.log_df_df[['Date','Topic','Where','Quantity','Notes']]
+        subset = plants_obj.log_df[plants_obj.log_df['Plant index'] == int(plantindex)]
+        data = subset[['Date','Topic','Where','Quantity','Notes']]
         # Calculate the effective page width
         epw = pdf.w - 2 * pdf.l_margin
         # Text height is the same as current font size
@@ -141,20 +143,20 @@ class Plants():
         col_width5 = 0
         for key,row in enumerate(data):
             if key == 0:
-                col_width = 15 #27
+                col_width = 20 #27
                 pdf.cell(col_width, th, str(row), border=1, fill=True)
             elif key == 1:
-                col_width2=int((epw - 15)/4)
+                col_width2=int((epw - 15)/4)-10
                 pdf.cell(col_width2, th, str(row), border=1, fill=True)
             elif key == 2:
-                col_width3=col_width4=int((epw - 15)/4)-15
+                col_width3=int((epw - 15)/4)-15
                 pdf.cell(col_width3, th, str(row), border=1, fill=True)   
             elif key == 3:
-                col_width3=col_width4=int((epw - 15)/4)-15
-                pdf.cell(col_width3, th, str(row), border=1, fill=True)                
+                col_width4=int((epw - 15)/4)-22
+                pdf.cell(col_width4, th, str(row), border=1, fill=True)                
             else:
-                col_width3=col_width4=int((epw - 15)/4)+30
-                pdf.cell(col_width4, th, str(row), border=1, fill=True)             
+                col_width5=int((epw - 15)/4)+42
+                pdf.cell(col_width5, th, str(row), border=1, fill=True)             
         #Create new line after header
         pdf.ln(th)
 
@@ -172,11 +174,12 @@ class Plants():
             pdf.cell(col_width2,th,str(row['Topic']),border=0, fill=True)
             pdf.cell(col_width3,th,str(row['Where']),border=0, fill=True)
             pdf.cell(col_width4,th,str(row['Quantity']),border=0, fill=True)
-            pdf.cell(col_width4,th,str(row['Notes']),border=0, fill=True)
+            #pdf.cell(col_width4,th,str(row['Notes']),border=0, fill=True)
+            pdf.multi_cell(col_width5-5, 6, str(row['Notes']), border=0, fill=True)
             pdf.ln(th)
         pdf.ln(th)
         pdf.set_y(0)
-        pdf.cell(0, 10, f'Garden Planner & Tracker by Jahascow\n{plantsummary}', 0, 0, 'C')
+        pdf.cell(0, 10, f'Garden Planner & Tracker by Jahascow: {plantsummary} Log Entries', 0, 0, 'C')
         pdf.output(pdf_file, 'F')
         subprocess.Popen([pdf_file],shell=True)
     def create_pdf(self):
@@ -695,6 +698,15 @@ def menu_select(size,image,image_resize):
                 log_selected_entry(trv.item(selected_item, 'values'))
             else:
                 print("No row selected")
+        def pdf_log_selected():
+            # Get the currently selected item
+            selected_item = trv.selection()
+            if selected_item:
+                # Get the values of the selected item
+                plants_obj.create_plant_log_pdf(trv.item(selected_item, 'values')[2]+', '+trv.item(selected_item, 'values')[3],trv.item(selected_item, 'values')[0])
+            else:
+                print("No row selected")
+            
         display_df = plants_obj.plant_df#.drop(columns=['Plant category', 'Genetics 1'])
         # Buttoms frame for content frame 
         contentframe1_buttons_frame = Frame(contentframe1, bg=color_pallet_dict[3], width=550, height=100)
@@ -716,6 +728,7 @@ def menu_select(size,image,image_resize):
         btn_select_record = Button(contentframe1_buttons_frame, text="View Plant", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
         btn_log_selected = Button(contentframe1_buttons_frame, text="Plant Log Entry", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=log_selected)
         btn_create_plant_pdf = Button(contentframe1_buttons_frame, text="Plant Index PDF", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
+        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Select Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
         '''Layout the widgets in the content frame'''
         contentframe1_buttons_frame.grid(column=1, columnspan=3, row=3, padx=0, pady=0, sticky='ESW')
         contentframe1_buttons_frame.rowconfigure(1,weight=1)
@@ -754,6 +767,7 @@ def menu_select(size,image,image_resize):
             df_list = []
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
+        btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
         btn_create_plant_pdf.grid(row=3, column=3, padx=20, pady=20, sticky='s')
     def add_plant():
         clearFrame() # clear out contentframe1 contents

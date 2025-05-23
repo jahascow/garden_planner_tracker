@@ -118,6 +118,67 @@ class Plants():
             self.log_df_cur_index = self.log_df['Log index'].max()
     def __str__(self):
         return 'Plants Object: Example -> ' + str(self.plant_df['Plant name'][0])
+    def create_plant_log_pdf(self,plantsummary):
+        pdf_file = os.path.join(os.path.dirname(__file__), str('plant_log_index.pdf'))
+        pdf = fpdf.FPDF()
+        pdf.add_page()        
+        # Set the font
+        pdf.set_font("Times", size=14, style="B")
+        # Define the table data
+        data = plants_obj.log_df_df[['Date','Topic','Where','Quantity','Notes']]
+        # Calculate the effective page width
+        epw = pdf.w - 2 * pdf.l_margin
+        # Text height is the same as current font size
+        th = pdf.font_size
+        # Draw the table headers
+        pdf.set_fill_color(color_pallet_dict[6][0],color_pallet_dict[6][1],color_pallet_dict[6][2])  # Set the fill color to blue
+        pdf.set_text_color(color_pallet_dict[5][0],color_pallet_dict[5][1],color_pallet_dict[5][2])  # Set text color to white
+        # Setup scope level variables
+        col_width = 0
+        col_width2 = 0
+        col_width3 = 0
+        col_width4 = 0
+        col_width5 = 0
+        for key,row in enumerate(data):
+            if key == 0:
+                col_width = 15 #27
+                pdf.cell(col_width, th, str(row), border=1, fill=True)
+            elif key == 1:
+                col_width2=int((epw - 15)/4)
+                pdf.cell(col_width2, th, str(row), border=1, fill=True)
+            elif key == 2:
+                col_width3=col_width4=int((epw - 15)/4)-15
+                pdf.cell(col_width3, th, str(row), border=1, fill=True)   
+            elif key == 3:
+                col_width3=col_width4=int((epw - 15)/4)-15
+                pdf.cell(col_width3, th, str(row), border=1, fill=True)                
+            else:
+                col_width3=col_width4=int((epw - 15)/4)+30
+                pdf.cell(col_width4, th, str(row), border=1, fill=True)             
+        #Create new line after header
+        pdf.ln(th)
+
+        # Iterating over rows to populate table data
+        pdf.set_font("Times", size=12)
+        th=pdf.font_size
+        pdf.set_text_color(0, 0, 0)  # Set text color to 
+        for index, row in data.iterrows():
+            if index % 2 != 0:
+                pdf.set_fill_color(color_pallet_dict[4][0],color_pallet_dict[4][1],color_pallet_dict[4][2])  # Set the fill color to greyish
+            else:
+                pdf.set_fill_color(color_pallet_dict[5][0],color_pallet_dict[5][1],color_pallet_dict[5][2])  # Set the fill color to white
+            
+            pdf.cell(col_width,th,str(row['Date']),border=0, fill=True)
+            pdf.cell(col_width2,th,str(row['Topic']),border=0, fill=True)
+            pdf.cell(col_width3,th,str(row['Where']),border=0, fill=True)
+            pdf.cell(col_width4,th,str(row['Quantity']),border=0, fill=True)
+            pdf.cell(col_width4,th,str(row['Notes']),border=0, fill=True)
+            pdf.ln(th)
+        pdf.ln(th)
+        pdf.set_y(0)
+        pdf.cell(0, 10, f'Garden Planner & Tracker by Jahascow\n{plantsummary}', 0, 0, 'C')
+        pdf.output(pdf_file, 'F')
+        subprocess.Popen([pdf_file],shell=True)
     def create_pdf(self):
         pdf_file = os.path.join(os.path.dirname(__file__), str('plant_index.pdf'))
         pdf = fpdf.FPDF()

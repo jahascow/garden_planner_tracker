@@ -126,7 +126,11 @@ class Plants():
         # Set the font
         pdf.set_font("Times", size=14, style="B")
         # Define the table data
-        subset = plants_obj.log_df[plants_obj.log_df['Plant index'] == int(plantindex)]
+        if plantindex != 'all':
+            # plant selected created subset
+            subset = plants_obj.log_df[plants_obj.log_df['Plant index'] == int(plantindex)]
+        else:
+            subset = plants_obj.log_df
         data = subset[['Date','Topic','Where','Quantity','Notes']]
         # Calculate the effective page width
         epw = pdf.w - 2 * pdf.l_margin
@@ -705,7 +709,9 @@ def menu_select(size,image,image_resize):
                 # Get the values of the selected item
                 plants_obj.create_plant_log_pdf(trv.item(selected_item, 'values')[2]+', '+trv.item(selected_item, 'values')[3],trv.item(selected_item, 'values')[0])
             else:
-                print("No row selected")
+                print("No row selected, showing all logs")
+                plants_obj.create_plant_log_pdf('All Plants','all')
+
             
         display_df = plants_obj.plant_df#.drop(columns=['Plant category', 'Genetics 1'])
         # Buttoms frame for content frame 
@@ -725,9 +731,11 @@ def menu_select(size,image,image_resize):
             foreground="black",
             rowheight=25,
             fieldbackground=color_pallet_dict[1])
-        btn_select_record = Button(contentframe1_buttons_frame, text="View Plant", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
+        btn_select_record = Button(contentframe1_buttons_frame, text="View Plant Detail", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
         btn_log_selected = Button(contentframe1_buttons_frame, text="Plant Log Entry", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=log_selected)
-        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Select Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
+        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
+        btn_create_selected_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
+
         '''Layout the widgets in the content frame'''
         contentframe1_buttons_frame.grid(column=1, columnspan=3, row=3, padx=0, pady=0, sticky='ESW')
         contentframe1_buttons_frame.rowconfigure(1,weight=1)
@@ -767,6 +775,8 @@ def menu_select(size,image,image_resize):
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
         btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
+        btn_create_selected_plant_log_pdf.grid(row=3, column=3, padx=20, pady=20, sticky='s')
+
         
     def add_plant():
         clearFrame() # clear out contentframe1 contents

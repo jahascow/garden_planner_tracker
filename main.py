@@ -16,6 +16,7 @@ import subprocess
 # 3rd-Party
 from tkinter import *
 from tkinter import Tk,ttk
+from tkcalendar import DateEntry
 from PIL import Image, ImageTk
 import fpdf
 
@@ -30,12 +31,13 @@ color_pallet_dict = {
     8: '#ffffff' # in place of white
 }
 example_log_entry_dict = {
+    # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'
     'Log index': [''], # create log entry index id
     'Plant index': [''], # the index of the plant referenced for log entry or blank for general log entry
     'Topic': [''], # short entry for grouping topics freeform eg, transplant, direct sow, learning, informational
     'Date': [''], # specify a date for this log entry
     'Where': [''], # way to differentiate where an action for this log entry refers to; eg main garden, wicking tub
-    'Qty': [''], # if tracking of an amount of something done like planting of a tomato you can track how many
+    'Quantity': [''], # if tracking of an amount of something done like planting of a tomato you can track how many
     'Notes': [''] # open text for any information you want to log for future refrerence
 }
 example_plant_entry_dict = {
@@ -190,6 +192,19 @@ class Plants():
             'Other notes': [submit_results[15]] # eg determinate
         }
         self.plant_df_new = pd.DataFrame(data_temp)
+    def make_log_df(self,submit_results):
+        data_temp = {
+            # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'
+            'Log index': [submit_results[0]], # create log entry index id
+            'Plant index': [submit_results[1]], # ( may be off by one need to verify, the index of the plant referenced for log entry or blank for general log entry
+            'Topic': [submit_results[2]], # short entry for grouping topics freeform eg, transplant, direct sow, learning, informational
+            'Date': [submit_results[3]], # specify a date for this log entry
+            'Where': [submit_results[4]], # way to differentiate where an action for this log entry refers to; eg main garden, wicking tub
+            'Quantity': [submit_results[5]], # if tracking of an amount of something done like planting of a tomato you can track how many
+            'Notes': [submit_results[6]] # open text for any information you want to log for future refrerence
+
+        }
+        self.plant_df_new = pd.DataFrame(data_temp)
     def plant_update(self,submit_results):
         # Update record of the existing DataFrame
         data = self.plant_df
@@ -203,6 +218,14 @@ class Plants():
         # now we need to build a dataframe dictionary with these variables 
         print(self.plant_df_cur_index+1,submit_results)
         self.make_plant_df(self.plant_df_cur_index+1,submit_results)
+        # now we need to save / append to existing data & datafile
+        self.plant_csv_insert()
+        # refresh plant object
+        self.refresh_plant_object()
+    def log_entry(self,submit_results):
+        # now we need to build a dataframe dictionary with these variables 
+        print(submit_results)
+        self.make_log_df(submit_results)
         # now we need to save / append to existing data & datafile
         self.plant_csv_insert()
         # refresh plant object
@@ -224,6 +247,40 @@ def menu_select(size,image,image_resize):
     def log_selected_entry(plant):
         clearFrame()
         print(plant)
+        # declaring string variables for storing values of entry form
+        # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'
+        var_log_logindex = StringVar(contentframe1)
+        var_log_topic = StringVar(contentframe1)
+        var_log_date = StringVar(contentframe1)
+        var_log_where = StringVar(contentframe1)
+        var_log_quantity = StringVar(contentframe1)
+        var_log_notes = StringVar(contentframe1)
+        def submit():
+            # form variables return values
+            log_logindex = var_log_logindex.get() + 1
+            log_plantindex = plant[0]
+            log_topic = var_log_topic.get()
+            log_date = var_log_date.get_date()
+            log_where = var_log_where.get()
+            log_quantity = var_log_quantity.get()
+            log_notes = var_log_notes.get('1.0',END) # differs from entry
+            if len(log_notes) < 2:
+                other_notes = 'none'
+            submit_results = [int(log_logindex),log_plantindex,str(log_topic),str(log_date),str(log_where),\
+                int(log_quantity),str(log_notes)]
+            plants_obj.log_entry(submit_results)
+        
+        # Create a DateEntry widget
+        var_log_date = DateEntry(contentframe1, width=12, background='darkblue', foreground='white', borderwidth=2)
+        var_log_date.pack(padx=10, pady=10)
+        
+        # Create a button to get the selected date
+        btn_submit = Button(contentframe1,text = 'Create Log Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
+        
+        '''Form Submission'''
+        btn_submit.grid(row=16,column=0,columnspan=2,pady=20,sticky='s')
+
+        
     def view_plant_entry(plant):
         clearFrame()
         # declaring string variables for storing values of entry form
@@ -268,7 +325,7 @@ def menu_select(size,image,image_resize):
                 int(maturity_end),str(genetics_1),str(genetics_2),str(genetics_3),\
                 float(plant_depth_min),float(plant_depth_max),float(plant_spacing_min),\
                 float(plant_spacing_max),int(number_of_plants_per_space),str(other_notes)]
-            plants_obj.plant_update(submit_results)
+            plants_obj.plant_entry(submit_results)
         def populate_defaults():
             # ways to repopulate form values after submit if desired
             #var_plant_category.set("jenga")

@@ -1034,7 +1034,7 @@ def menu_select(size,image,image_resize):
     addplant_button = Button(buttonsframe, text='Add Plant', font=("TkDefaultFont",10,'bold'),
                            bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=add_plant) #,anchor='w', justify='left',
     # Plant pdf widget
-    btn_create_plant_pdf = Button(buttonsframe, text="Plant Index Card", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
+    btn_create_plant_pdf = Button(buttonsframe, text="Plants Index Card", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
 
     # Exit widget
     exit_button = Button(buttonsframe, text="Exit", font=("TkDefaultFont",10,'bold'), bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=shutdown_app)    

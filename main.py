@@ -1019,11 +1019,11 @@ def menu_select(size,image,image_resize):
     image_label = Label(buttonsframe, image=img, background=color_pallet_dict[2]) # Create a label and assign image
     image_label.image = img  # Keep a reference to avoid garbage collection
     # Show plants widget
-    showplants_button = Button(buttonsframe, text='Show Plants', font=("TkDefaultFont",10,'bold'),
-                           command=show_plants) #,anchor='w', justify='left',  
+    showplants_button = Button(buttonsframe, text='Show Plants', font=("TkDefaultFont",10,'bold'), 
+                               bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=show_plants) #,anchor='w', justify='left',  
     # Add plant widget 
     addplant_button = Button(buttonsframe, text='Add Plant', font=("TkDefaultFont",10,'bold'),
-                           command=add_plant) #,anchor='w', justify='left',
+                           bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=add_plant) #,anchor='w', justify='left',
     # Exit widget
     exit_button = Button(buttonsframe, text="Exit", font=("TkDefaultFont",10,'bold'), bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=shutdown_app)    
     

@@ -93,14 +93,14 @@ class Plants():
         # Establish dataframes from csv or example data
         if self.file_check == False: # File does not exist, create dataframe with test data
             self.plant_df = pd.DataFrame(example_plant_entry_dict)
-            print('No plants defined.')
+            print('No plants currently defined.')
             self.plant_df_cur_index = 0
         else: # File exists load as a dataframe
             self.plant_df = pd.read_csv(self.plant_df_file)
             self.plant_df_cur_index = self.plant_df['Plant index'].max()
         if self.log_file_check == False: # File does not exist, create dataframe with test data
             self.log_df = pd.DataFrame(example_log_entry_dict)
-            print('No logs created.')
+            print('No log entries currently exist.')
             self.log_df_cur_index = 0
         else: # File exists load as a dataframe
             self.log_df = pd.read_csv(self.log_df_file)
@@ -237,7 +237,7 @@ class Plants():
         # now we need to save / append to existing data & datafile
         self.plant_csv_insert()
         # refresh plant object
-        self.refresh_plant_object()
+        self.refresh_log_object()
         
 def menu_select(size,image,image_resize):
     global display_df
@@ -257,16 +257,15 @@ def menu_select(size,image,image_resize):
         print(plant)
         # declaring string variables for storing values of entry form
         # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'
-        var_log_logindex = StringVar(contentframe1)
+        log_logindex = plants_obj.log_df_cur_index + 1
         var_log_topic = StringVar(contentframe1)
         var_log_date = StringVar(contentframe1)
         var_log_where = StringVar(contentframe1)
         var_log_quantity = StringVar(contentframe1)
         var_log_notes = StringVar(contentframe1)
+        
         def submit():
             # form variables return values
-            log_logindex = var_log_logindex.get() + 1
-            log_plantindex = plant[0]
             log_topic = var_log_topic.get()
             log_date = var_log_date.get_date()
             log_where = var_log_where.get()
@@ -274,19 +273,30 @@ def menu_select(size,image,image_resize):
             log_notes = var_log_notes.get('1.0',END) # differs from entry
             if len(log_notes) < 2:
                 other_notes = 'none'
-            submit_results = [int(log_logindex),log_plantindex,str(log_topic),str(log_date),str(log_where),\
+            submit_results = [int(log_logindex),plant[0],str(log_topic),str(log_date),str(log_where),\
                 int(log_quantity),str(log_notes)]
             plants_obj.log_entry(submit_results)
         
         # Create a DateEntry widget
         var_log_date = DateEntry(contentframe1, width=12, background='darkblue', foreground='white', borderwidth=2)
-        var_log_date.pack(padx=10, pady=10)
         
         # Create a button to get the selected date
         btn_submit = Button(contentframe1,text = 'Create Log Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
         
+        '''Create the widgets for the contentframe1'''
+        # First all the labels
+        label_log_plant_index = Label(contentframe1, text = f'Log for {plant[2]}, variety {plant[3]}, Plant ID #({plant[0]}):', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+
+        '''Layout the widgets in the content1frame'''
+        # label widgets
+        label_log_plant_index.grid(row=0,column=0, padx=5, pady=5, sticky='e')
+
+
         '''Form Submission'''
         btn_submit.grid(row=16,column=0,columnspan=2,pady=20,sticky='s')
+        var_log_date.grid()
+        
+        
 
         
     def view_plant_entry(plant):

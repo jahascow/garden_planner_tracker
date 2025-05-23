@@ -727,7 +727,6 @@ def menu_select(size,image,image_resize):
             fieldbackground=color_pallet_dict[1])
         btn_select_record = Button(contentframe1_buttons_frame, text="View Plant", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
         btn_log_selected = Button(contentframe1_buttons_frame, text="Plant Log Entry", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=log_selected)
-        btn_create_plant_pdf = Button(contentframe1_buttons_frame, text="Plant Index PDF", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
         btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Select Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
         '''Layout the widgets in the content frame'''
         contentframe1_buttons_frame.grid(column=1, columnspan=3, row=3, padx=0, pady=0, sticky='ESW')
@@ -768,7 +767,7 @@ def menu_select(size,image,image_resize):
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
         btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
-        btn_create_plant_pdf.grid(row=3, column=3, padx=20, pady=20, sticky='s')
+        
     def add_plant():
         clearFrame() # clear out contentframe1 contents
         # declaring string variables for storing values of entry form
@@ -1024,6 +1023,9 @@ def menu_select(size,image,image_resize):
     # Add plant widget 
     addplant_button = Button(buttonsframe, text='Add Plant', font=("TkDefaultFont",10,'bold'),
                            bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=add_plant) #,anchor='w', justify='left',
+    # Plant pdf widget
+    btn_create_plant_pdf = Button(buttonsframe, text="Plant Index Card", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
+
     # Exit widget
     exit_button = Button(buttonsframe, text="Exit", font=("TkDefaultFont",10,'bold'), bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=shutdown_app)    
     
@@ -1031,7 +1033,9 @@ def menu_select(size,image,image_resize):
     image_label.grid(row=0, column=0)
     showplants_button.grid(row=1, column=0, padx=15, pady=15, sticky='ew') 
     addplant_button.grid(row=2, column=0, padx=15, sticky='ew') 
-    exit_button.grid(row=3, column=0, sticky='s', pady=400)
+    btn_create_plant_pdf.grid(row=3, column=0, padx=15, pady=20, sticky='ew')
+    exit_button.grid(row=4, column=0, sticky='s', pady=300)
+    
 
     root.mainloop() 
 

@@ -12,6 +12,7 @@ import os
 import os.path
 import pandas as pd
 import subprocess
+from datetime import datetime
 
 # 3rd-Party
 from tkinter import *
@@ -82,8 +83,18 @@ class Plants():
         self.plant_df = pd.read_csv(self.plant_df_file)
         self.plant_df_cur_index = self.plant_df['Plant index'].max()
     def refresh_log_object(self):
-        self.log_df = pd.read_csv(self.log_df_file)
-        self.log_df_cur_index = self.log_df['Log index'].max()
+        # Setup log dataframes / file checks
+        self.log_df_file = os.path.join(os.path.dirname(__file__), 'df', str('log.csv'))
+        self.log_file_check = os.path.isfile(self.log_df_file)
+        if self.log_file_check == False: # File does not exist, create dataframe with test data
+            self.log_df = pd.DataFrame(example_log_entry_dict)
+            print('No log entries currently exist.')
+            self.log_df_cur_index = 0
+        else: # File exists load as a dataframe
+            self.log_df = pd.read_csv(self.log_df_file)
+            self.log_df_cur_index = self.log_df['Log index'].max()
+
+        
     def __init__(self):
         # Setup plant and log dataframes / file checks
         self.plant_df_file = os.path.join(os.path.dirname(__file__), 'df', str('plants.csv'))
@@ -224,7 +235,7 @@ class Plants():
         self.refresh_plant_object()        
     def plant_entry(self,submit_results):
         # now we need to build a dataframe dictionary with these variables 
-        print(self.plant_df_cur_index+1,submit_results)
+        #print(self.plant_df_cur_index+1,submit_results)
         self.make_plant_df(self.plant_df_cur_index+1,submit_results)
         # now we need to save / append to existing data & datafile
         self.plant_csv_insert()
@@ -232,10 +243,10 @@ class Plants():
         self.refresh_plant_object()
     def log_entry(self,submit_results):
         # now we need to build a dataframe dictionary with these variables 
-        print(submit_results)
+        #print(submit_results)
         self.make_log_df(submit_results)
         # now we need to save / append to existing data & datafile
-        self.plant_csv_insert()
+        self.log_csv_insert()
         # refresh plant object
         self.refresh_log_object()
         
@@ -252,9 +263,31 @@ def menu_select(size,image,image_resize):
         for widget in contentframe1.winfo_children():
             widget.destroy()
         contentframe1.pack_forget()
-    def log_selected_entry(plant):
+    def log_selected_entry(plant,**kwargs):
         clearFrame()
-        print(plant)
+        form_update_verbose = kwargs.get('success')
+        if form_update_verbose == None:
+            form_update_verbose = ''
+         # Buttoms frame for content frame 
+        contentframe1_buttons_frame = Frame(contentframe1, bg=color_pallet_dict[3], width=550, height=100)
+        
+        '''Configure contentframe1 grid layout'''
+        contentframe1.grid(row=0,column=1,padx=0,pady=0)
+        contentframe1.grid_columnconfigure(0, weight=0)
+        contentframe1.grid_columnconfigure(1, weight=3)
+        
+        '''Configure contentframe1_buttons_frame layout'''
+        contentframe1_buttons_frame.grid(column=0, columnspan=3, row=6, padx=0, pady=0, sticky='ESW')
+        contentframe1_buttons_frame.rowconfigure(0,weight=2)
+        contentframe1_buttons_frame.rowconfigure(1,weight=2)
+        contentframe1_buttons_frame.rowconfigure(2,weight=2)
+        contentframe1_buttons_frame.rowconfigure(3,weight=2)
+        contentframe1_buttons_frame.rowconfigure(4,weight=2)
+        contentframe1_buttons_frame.rowconfigure(5,weight=2)
+        contentframe1_buttons_frame.rowconfigure(6,weight=1)
+        contentframe1_buttons_frame.columnconfigure(1,weight=3)
+        
+        #print(plant)
         # declaring string variables for storing values of entry form
         # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'
         log_logindex = plants_obj.log_df_cur_index + 1
@@ -262,42 +295,107 @@ def menu_select(size,image,image_resize):
         var_log_date = StringVar(contentframe1)
         var_log_where = StringVar(contentframe1)
         var_log_quantity = StringVar(contentframe1)
-        var_log_notes = StringVar(contentframe1)
+        text_log_notes = StringVar(contentframe1)
+        
+        def populate_defaults():
+            #plants_obj.refresh_log_object()
+            log_selected_entry(plant,success=f'Successfully logged {plant[2]}.  Enter another for ')
         
         def submit():
             # form variables return values
             log_topic = var_log_topic.get()
             log_date = var_log_date.get_date()
             log_where = var_log_where.get()
+            if len(log_where) < 2:
+                log_where = 'not specified'
             log_quantity = var_log_quantity.get()
-            log_notes = var_log_notes.get('1.0',END) # differs from entry
+            if len(log_quantity) < 2:
+                log_quantity = 0
+            log_notes = text_log_notes.get('1.0',END) # differs from entry
             if len(log_notes) < 2:
-                other_notes = 'none'
+                log_notes = 'none'
             submit_results = [int(log_logindex),plant[0],str(log_topic),str(log_date),str(log_where),\
                 int(log_quantity),str(log_notes)]
             plants_obj.log_entry(submit_results)
+            populate_defaults()
         
         # Create a DateEntry widget
         var_log_date = DateEntry(contentframe1, width=12, background='darkblue', foreground='white', borderwidth=2)
-        
-        # Create a button to get the selected date
-        btn_submit = Button(contentframe1,text = 'Create Log Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
-        
+
         '''Create the widgets for the contentframe1'''
+        #str(log_topic),str(log_date),str(log_where), int(log_quantity),str(log_notes)
         # First all the labels
-        label_log_plant_index = Label(contentframe1, text = f'Log for {plant[2]}, variety {plant[3]}, Plant ID #({plant[0]}):', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_log_plant_index = Label(contentframe1, text = f'{form_update_verbose}Log for {plant[2]}, variety {plant[3]}, Plant ID #({plant[0]}):', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        label_log_date = Label(contentframe1, text = 'Select date for entry:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
+        label_log_topic = Label(contentframe1, text = 'Topic:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
+        label_log_where = Label(contentframe1, text = 'Location:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
+        label_log_quantity = Label(contentframe1, text = 'Quantity:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
+        label_log_notes = Label(contentframe1, text = 'Notes:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
+        # Entry labels
+        entry_log_topic = Entry(contentframe1,textvariable=var_log_topic, width=65, font=("TkDefaultFont",10,'normal'))
+        entry_log_where = Entry(contentframe1,textvariable=var_log_where, width=65, font=("TkDefaultFont",10,'normal'))
+        entry_log_quantity = Entry(contentframe1,textvariable=var_log_quantity, width=65, font=("TkDefaultFont",10,'normal'))
+        # text labels
+        text_log_notes = Text(contentframe1, width=65, height=20, font=("TkDefaultFont",10,'normal'))
+
+        '''Create the widgets for the contentframe1_buttons_frame'''  
+        # Create a button to create log entry
+        btn_submit = Button(contentframe1_buttons_frame,text = 'Create Log Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
 
         '''Layout the widgets in the content1frame'''
         # label widgets
-        label_log_plant_index.grid(row=0,column=0, padx=5, pady=5, sticky='e')
-
-
-        '''Form Submission'''
-        btn_submit.grid(row=16,column=0,columnspan=2,pady=20,sticky='s')
-        var_log_date.grid()
+        label_log_plant_index.grid(row=0,column=0, columnspan=2, padx=5, pady=15, sticky='w')
+        label_log_date.grid(row=1,column=0, padx=5, pady=15, sticky='e')
+        label_log_topic.grid(row=2,column=0, padx=5, pady=5, sticky='ne')
+        label_log_where.grid(row=3,column=0, padx=5, pady=5, sticky='ne')
+        label_log_quantity.grid(row=4,column=0, padx=5, pady=5, sticky='ne')
+        label_log_notes.grid(row=5,column=0, padx=5, pady=5, sticky='ne')
+        # date entry widget
+        var_log_date.grid(row=1,column=1, padx=5, pady=15, sticky='w')
+        # entry widgets      
+        entry_log_topic.grid(row=2,column=1, padx=5, pady=5, sticky='nw')
+        entry_log_where.grid(row=3,column=1, padx=5, pady=5, sticky='nw')
+        entry_log_quantity.grid(row=4,column=1, padx=5, pady=5, sticky='nw')
+        # text widgets
+        text_log_notes.grid(row=5,column=1, padx=5, pady=5, sticky='nw')
         
+        '''Layout the widgets in the content buttons frame'''
+        btn_submit.grid(row=0,column=0,columnspan=2,pady=20,sticky='s')
         
+        '''Tooltips Configuration'''
+        # tooltip labels
+        tip_log_topic = ttk.Label(contentframe1, text="Log topic is a generalization of what action with plant was done:\neg; Direct sow, Transplant, Store bought transplant", background='light yellow')
+        tip_log_where = ttk.Label(contentframe1, text="Where can be any area where this event or plant occured:\neg; Main garden, Wicking bucket, Raised bed", background='light yellow')
+        tip_log_quantity = ttk.Label(contentframe1, text="Track how many plants where affected, or 0 for none", background='light yellow')
 
+        # tooltip show functions     
+        def show_tooltip_log_topic(event): 
+            tip_log_topic.place(anchor='nw', relx=0.215, rely=.11)
+            tip_log_topic.lift(aboveThis=None)
+        def show_tooltip_log_where(event): 
+            tip_log_where.place(anchor='nw', relx=0.215, rely=.141) # rely increments by .031
+            tip_log_where.lift(aboveThis=None)          
+        def show_tooltip_log_quantity(event): 
+            tip_log_quantity.place(anchor='nw', relx=0.215, rely=.172)
+            tip_log_quantity.lift(aboveThis=None)  
+                        
+        # tooltip hide functions
+        def hide_tooltip_log_topic(event): 
+            tip_log_topic.place_forget()
+        def hide_tooltip_log_where(event): 
+            tip_log_where.place_forget()
+        def hide_tooltip_log_quantity(event): 
+            tip_log_quantity.place_forget()
+
+        # tooltip <Enter> label bindings
+        label_log_topic.bind("<Enter>", show_tooltip_log_topic)
+        label_log_where.bind("<Enter>", show_tooltip_log_where)
+        label_log_quantity.bind("<Enter>", show_tooltip_log_quantity)
+
+        # tooltip <Leave> label bindings
+        label_log_topic.bind("<Leave>", hide_tooltip_log_topic)
+        label_log_where.bind("<Leave>", hide_tooltip_log_where)
+        label_log_quantity.bind("<Leave>", hide_tooltip_log_quantity)
         
     def view_plant_entry(plant):
         clearFrame()
@@ -346,9 +444,6 @@ def menu_select(size,image,image_resize):
             plants_obj.plant_entry(submit_results)
         def populate_defaults():
             # ways to repopulate form values after submit if desired
-            #var_plant_category.set("jenga")
-            #var_plant_name.set("")
-            #var_plant_variety.set(plant_variety)
             var_plant_category.set(plant[1])
             var_plant_name.set(plant[2])
             var_plant_variety.set(plant[3])
@@ -707,7 +802,7 @@ def menu_select(size,image,image_resize):
         # Submit Plant Button
         btn_submit = Button(contentframe1,text = 'Submit Plant Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
         
-        '''Layout the widgets in the buttonsframe'''
+        '''Configure contentframe1 grid layout'''
         contentframe1.grid(row=0,column=1,padx=0,pady=0)
         contentframe1.grid_columnconfigure(0, weight=0)
         contentframe1.grid_columnconfigure(1, weight=3)

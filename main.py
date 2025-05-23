@@ -179,7 +179,7 @@ class Plants():
             pdf.ln(th)
         pdf.ln(th)
         pdf.set_y(0)
-        pdf.cell(0, 10, f'Garden Planner & Tracker by Jahascow: {plantsummary} Log Entries', 0, 0, 'C')
+        pdf.cell(0, 10, f'Garden Planner & Tracker by Jahascow: "{plantsummary}" Log Entries', 0, 0, 'C')
         pdf.output(pdf_file, 'F')
         subprocess.Popen([pdf_file],shell=True)
     def create_pdf(self):

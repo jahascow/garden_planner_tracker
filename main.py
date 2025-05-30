@@ -5,7 +5,8 @@ by : jahascow
 
 Module About:
     This file is for processing of plant specific data.
-    next to add is data entry form for logs with option selector for plant (optional?)
+    Need to correct display plant index errors when no df has yet been created
+    perhaps just disable the button(s) if no plants added yet?
 """
 # Native
 import os
@@ -18,6 +19,7 @@ from datetime import datetime
 from tkinter import *
 from tkinter import Tk,ttk
 from tkcalendar import DateEntry
+from functools import partial # used to pass commands to tkinter functions
 from PIL import Image, ImageTk
 import fpdf
 
@@ -79,50 +81,126 @@ plant_config_dict = {
     15: 'Other notes' # eg determinate or whatever
 }
 class Plants():
-    def refresh_plant_object(self):
-        self.plant_df = pd.read_csv(self.plant_df_file)
-        self.plant_df_cur_index = self.plant_df['Plant index'].max()
-    def refresh_log_object(self):
+    def refresh_plant_object(self) -> None:
+        """
+        Refreshes the plant DataFrame from the CSV file.
+
+        Reloads the plant data from the CSV file and updates the current plant index.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+
+        Attributes:
+            plant_df_file (str): Path to the plant CSV file.
+            plant_df (pd.DataFrame): DataFrame holding the plant data.
+            plant_df_cur_index (int): Current maximum index in the plant DataFrame.
+        """
+        # Setup plant dataframes / file checks
+        self.plant_df_file = os.path.join(os.path.dirname(__file__), 'df', str('plants.csv'))
+        self.file_check = os.path.isfile(self.plant_df_file)
+        
+        # Reload plant data from CSV file
+        self.plant_df: pd.DataFrame = pd.read_csv(self.plant_df_file)
+
+        # Update the current plant index
+        self.plant_df_cur_index: int = int(self.plant_df['Plant index'].max())
+        if not self.file_check:  # File does not exist, create DataFrame with test data
+            self.plant_df = pd.DataFrame(example_plant_entry_dict)
+            print('No plant entries currently exist.')
+            self.plant_df_cur_index = 0
+        else:  # File exists, load as a DataFrame
+            self.plant_df = pd.read_csv(self.plant_df_file)
+            try:
+                self.plant_df_cur_index = self.plant_df['Plant index'].max()
+            except KeyError:
+                print("Error: 'Plant index' column not found in plants.csv")
+                self.plant_df_cur_index = 0
+    def refresh_log_object(self) -> None:
+        """
+        Refreshes the log DataFrame from the CSV file.
+
+        Sets up the log dataframes and checks if the log CSV file exists.
+        If the file doesn't exist, it creates a new DataFrame with example log entries.
+        If the file exists, it loads the data into a DataFrame and updates the current log index.
+
+        Attributes:
+            log_df_file (str): Path to the log CSV file.
+            log_file_check (bool): Flag indicating if the log CSV file exists.
+            log_df (pd.DataFrame): DataFrame holding the log data.
+            log_df_cur_index (int): Current maximum index in the log DataFrame.
+        """
         # Setup log dataframes / file checks
         self.log_df_file = os.path.join(os.path.dirname(__file__), 'df', str('log.csv'))
         self.log_file_check = os.path.isfile(self.log_df_file)
-        if self.log_file_check == False: # File does not exist, create dataframe with test data
+        if not self.log_file_check:  # File does not exist, create DataFrame with test data
             self.log_df = pd.DataFrame(example_log_entry_dict)
             print('No log entries currently exist.')
             self.log_df_cur_index = 0
-        else: # File exists load as a dataframe
+        else:  # File exists, load as a DataFrame
             self.log_df = pd.read_csv(self.log_df_file)
-            self.log_df_cur_index = self.log_df['Log index'].max()
-
-        
+            try:
+                self.log_df_cur_index = self.log_df['Log index'].max()
+            except KeyError:
+                print("Error: 'Log index' column not found in log.csv")
+                self.log_df_cur_index = 0
     def __init__(self):
+        """
+        Initialize the Plants object.
+
+        This method is used to initialize the Plants object. It sets up the plant and log dataframes and checks if the files exist.
+        If the files do not exist, it creates a new dataframe with test data. If the files exist, it loads the data into a dataframe and updates the current index.
+        """
         # Setup plant and log dataframes / file checks
         self.plant_df_file = os.path.join(os.path.dirname(__file__), 'df', str('plants.csv'))
         self.file_check = os.path.isfile(self.plant_df_file)
         self.log_df_file = os.path.join(os.path.dirname(__file__), 'df', str('log.csv'))
         self.log_file_check = os.path.isfile(self.log_df_file)
         # Establish dataframes from csv or example data
-        if self.file_check == False: # File does not exist, create dataframe with test data
+        if not self.file_check:  # File does not exist, create dataframe with test data
             self.plant_df = pd.DataFrame(example_plant_entry_dict)
             print('No plants currently defined.')
             self.plant_df_cur_index = 0
-        else: # File exists load as a dataframe
+        else:  # File exists, load as a dataframe
             self.plant_df = pd.read_csv(self.plant_df_file)
             self.plant_df_cur_index = self.plant_df['Plant index'].max()
-        if self.log_file_check == False: # File does not exist, create dataframe with test data
+        if not self.log_file_check:  # File does not exist, create dataframe with test data
             self.log_df = pd.DataFrame(example_log_entry_dict)
             print('No log entries currently exist.')
             self.log_df_cur_index = 0
-        else: # File exists load as a dataframe
+        else:  # File exists, load as a dataframe
             self.log_df = pd.read_csv(self.log_df_file)
             self.log_df_cur_index = self.log_df['Log index'].max()
     def __str__(self):
-        return 'Plants Object: Example -> ' + str(self.plant_df['Plant name'][0])
-    def create_plant_log_pdf(self,plantsummary,plantindex):
-        print(plantindex,type(plantindex))
+        """
+        Return a string representation of the object.
+
+        The string representation will be in the form of:
+        'Plants Object: Example -> <plant name>'
+
+        :return: A string representation of the object
+        """
+        try:
+            return 'Plants Object: Example -> ' + str(self.plant_df['Plant name'][0])
+        except IndexError:
+            return 'Plants Object: No plants currently defined.'
+    def create_plant_log_pdf(self, plantsummary: str, plantindex: str) -> None:
+        """
+        Create a PDF file with log entries for the specified plant index.
+
+        This method creates a PDF file with log entries for the specified plant index.
+        The PDF will have a header with the plant summary and log entries.
+        Each log entry will have the date, topic, where, quantity, and notes.
+
+        :param plantsummary: The summary of the plant to be printed (str)
+        :param plantindex: The index of the plant to be printed (str)
+        :return: None
+        """
         pdf_file = os.path.join(os.path.dirname(__file__), str('plant_log_index.pdf'))
         pdf = fpdf.FPDF()
-        pdf.add_page()        
+        pdf.add_page()
         # Set the font
         pdf.set_font("Times", size=14, style="B")
         # Define the table data
@@ -131,61 +209,61 @@ class Plants():
             subset = plants_obj.log_df[plants_obj.log_df['Plant index'] == int(plantindex)]
         else:
             subset = plants_obj.log_df
-        data = subset[['Date','Topic','Where','Quantity','Notes']]
+        data = subset[['Date', 'Topic', 'Where', 'Quantity', 'Notes']]
         # Calculate the effective page width
         epw = pdf.w - 2 * pdf.l_margin
         # Text height is the same as current font size
         th = pdf.font_size
         # Draw the table headers
-        pdf.set_fill_color(color_pallet_dict[6][0],color_pallet_dict[6][1],color_pallet_dict[6][2])  # Set the fill color to blue
-        pdf.set_text_color(color_pallet_dict[5][0],color_pallet_dict[5][1],color_pallet_dict[5][2])  # Set text color to white
+        pdf.set_fill_color(color_pallet_dict[6][0], color_pallet_dict[6][1], color_pallet_dict[6][2])  # Set the fill color to blue
+        pdf.set_text_color(color_pallet_dict[5][0], color_pallet_dict[5][1], color_pallet_dict[5][2])  # Set text color to white
         # Setup scope level variables
         col_width = 0
         col_width2 = 0
         col_width3 = 0
         col_width4 = 0
         col_width5 = 0
-        for key,row in enumerate(data):
+        for key, row in enumerate(data):
             if key == 0:
-                col_width = 20 #27
+                col_width = 20  # 27
                 pdf.cell(col_width, th, str(row), border=1, fill=True)
             elif key == 1:
-                col_width2=int((epw - 15)/4)-10
+                col_width2 = int((epw - 15) / 4) - 10
                 pdf.cell(col_width2, th, str(row), border=1, fill=True)
             elif key == 2:
-                col_width3=int((epw - 15)/4)-15
-                pdf.cell(col_width3, th, str(row), border=1, fill=True)   
+                col_width3 = int((epw - 15) / 4) - 15
+                pdf.cell(col_width3, th, str(row), border=1, fill=True)
             elif key == 3:
-                col_width4=int((epw - 15)/4)-22
-                pdf.cell(col_width4, th, str(row), border=1, fill=True)                
+                col_width4 = int((epw - 15) / 4) - 22
+                pdf.cell(col_width4, th, str(row), border=1, fill=True)
             else:
-                col_width5=int((epw - 15)/4)+42
-                pdf.cell(col_width5, th, str(row), border=1, fill=True)             
-        #Create new line after header
+                col_width5 = int((epw - 15) / 4) + 42
+                pdf.cell(col_width5, th, str(row), border=1, fill=True)
+        # Create new line after header
         pdf.ln(th)
 
         # Iterating over rows to populate table data
         pdf.set_font("Times", size=12)
-        th=pdf.font_size
-        pdf.set_text_color(0, 0, 0)  # Set text color to 
+        th = pdf.font_size
+        pdf.set_text_color(0, 0, 0)  # Set text color to black
         for index, row in data.iterrows():
             if index % 2 != 0:
-                pdf.set_fill_color(color_pallet_dict[4][0],color_pallet_dict[4][1],color_pallet_dict[4][2])  # Set the fill color to greyish
+                pdf.set_fill_color(color_pallet_dict[4][0], color_pallet_dict[4][1], color_pallet_dict[4][2])  # Set the fill color to greyish
             else:
-                pdf.set_fill_color(color_pallet_dict[5][0],color_pallet_dict[5][1],color_pallet_dict[5][2])  # Set the fill color to white
-            
-            pdf.cell(col_width,th,str(row['Date']),border=0, fill=True)
-            pdf.cell(col_width2,th,str(row['Topic']),border=0, fill=True)
-            pdf.cell(col_width3,th,str(row['Where']),border=0, fill=True)
-            pdf.cell(col_width4,th,str(row['Quantity']),border=0, fill=True)
-            #pdf.cell(col_width4,th,str(row['Notes']),border=0, fill=True)
-            pdf.multi_cell(col_width5-5, 6, str(row['Notes']), border=0, fill=True)
+                pdf.set_fill_color(color_pallet_dict[5][0], color_pallet_dict[5][1], color_pallet_dict[5][2])  # Set the fill color to white
+
+            pdf.cell(col_width, th, str(row['Date']), border=0, fill=True)
+            pdf.cell(col_width2, th, str(row['Topic']), border=0, fill=True)
+            pdf.cell(col_width3, th, str(row['Where']), border=0, fill=True)
+            pdf.cell(col_width4, th, str(row['Quantity']), border=0, fill=True)
+            # pdf.cell(col_width4,th,str(row['Notes']),border=0, fill=True)
+            pdf.multi_cell(col_width5 - 5, 6, str(row['Notes']), border=0, fill=True)
             pdf.ln(th)
         pdf.ln(th)
         pdf.set_y(0)
         pdf.cell(0, 10, f'Garden Planner & Tracker by Jahascow: "{plantsummary}" Log Entries', 0, 0, 'C')
         pdf.output(pdf_file, 'F')
-        subprocess.Popen([pdf_file],shell=True)
+        subprocess.Popen([pdf_file], shell=True)
     def create_pdf(self):
         pdf_file = os.path.join(os.path.dirname(__file__), str('plant_index.pdf'))
         pdf = fpdf.FPDF()
@@ -319,6 +397,7 @@ class Plants():
         self.refresh_log_object()
         
 def menu_select(size,image,image_resize):
+    
     global display_df
     '''Main menu for app'''
     def shutdown_app():
@@ -346,14 +425,10 @@ def menu_select(size,image,image_resize):
         
         '''Configure contentframe1_buttons_frame layout'''
         contentframe1_buttons_frame.grid(column=0, columnspan=3, row=6, padx=0, pady=0, sticky='ESW')
-        contentframe1_buttons_frame.rowconfigure(0,weight=2)
-        contentframe1_buttons_frame.rowconfigure(1,weight=2)
-        contentframe1_buttons_frame.rowconfigure(2,weight=2)
-        contentframe1_buttons_frame.rowconfigure(3,weight=2)
-        contentframe1_buttons_frame.rowconfigure(4,weight=2)
-        contentframe1_buttons_frame.rowconfigure(5,weight=2)
-        contentframe1_buttons_frame.rowconfigure(6,weight=1)
-        contentframe1_buttons_frame.columnconfigure(1,weight=3)
+        for i in range(6):
+            contentframe1_buttons_frame.rowconfigure(i, weight=2)
+        contentframe1_buttons_frame.rowconfigure(6, weight=1)
+        contentframe1_buttons_frame.columnconfigure(1, weight=3)
         
         #print(plant)
         # declaring string variables for storing values of entry form
@@ -431,76 +506,63 @@ def menu_select(size,image,image_resize):
         btn_submit.grid(row=0,column=0,columnspan=2,pady=20,sticky='s')
         
         '''Tooltips Configuration'''
-        # tooltip labels
-        tip_log_topic = ttk.Label(contentframe1, text="Log topic is a generalization of what action with plant was done:\neg; Direct sow, Transplant, Store bought transplant", background='light yellow')
-        tip_log_where = ttk.Label(contentframe1, text="Where can be any area where this event or plant occured:\neg; Main garden, Wicking bucket, Raised bed", background='light yellow')
-        tip_log_quantity = ttk.Label(contentframe1, text="Track how many plants where affected, or 0 for none", background='light yellow')
-
-        # tooltip show functions     
-        def show_tooltip_log_topic(event): 
-            tip_log_topic.place(anchor='nw', relx=0.215, rely=.11)
-            tip_log_topic.lift(aboveThis=None)
-        def show_tooltip_log_where(event): 
-            tip_log_where.place(anchor='nw', relx=0.215, rely=.141) # rely increments by .031
-            tip_log_where.lift(aboveThis=None)          
-        def show_tooltip_log_quantity(event): 
-            tip_log_quantity.place(anchor='nw', relx=0.215, rely=.172)
-            tip_log_quantity.lift(aboveThis=None)  
-                        
-        # tooltip hide functions
-        def hide_tooltip_log_topic(event): 
-            tip_log_topic.place_forget()
-        def hide_tooltip_log_where(event): 
-            tip_log_where.place_forget()
-        def hide_tooltip_log_quantity(event): 
-            tip_log_quantity.place_forget()
-
-        # tooltip <Enter> label bindings
-        label_log_topic.bind("<Enter>", show_tooltip_log_topic)
-        label_log_where.bind("<Enter>", show_tooltip_log_where)
-        label_log_quantity.bind("<Enter>", show_tooltip_log_quantity)
-
-        # tooltip <Leave> label bindings
-        label_log_topic.bind("<Leave>", hide_tooltip_log_topic)
-        label_log_where.bind("<Leave>", hide_tooltip_log_where)
-        label_log_quantity.bind("<Leave>", hide_tooltip_log_quantity)
+        tooltips = {
+            'log_topic': "Log topic is a generalization of what action with plant was done:\neg; Direct sow, Transplant, Store bought transplant",
+            'log_where': "Where can be any area where this event or plant occured:\neg; Main garden, Wicking bucket, Raised bed",
+            'log_quantity': "Track how many plants where affected, or 0 for none"
+        }
+        tip = ttk.Label(contentframe1, text='', background='light yellow')
+        def show_tooltip(event, key):
+            tip.config(text=tooltips[key])
+            tip.place(anchor='nw', relx=0.215, rely=.11 + .045 * list(tooltips.keys()).index(key))
+            tip.lift(aboveThis=None)
+        def hide_tooltip(event):
+            tip.place_forget()
         
+        for key, label in [('log_topic', label_log_topic), ('log_where', label_log_where), ('log_quantity', label_log_quantity)]:
+            label.bind("<Enter>", lambda event, key=key: show_tooltip(event, key))
+            label.bind("<Leave>", hide_tooltip)
     def view_plant_entry(plant):
         clearFrame()
         # declaring string variables for storing values of entry form
-        var_plant_category = StringVar(contentframe1)
-        var_plant_name = StringVar(contentframe1)
-        var_plant_variety = StringVar(contentframe1)
-        var_germination_start = StringVar(contentframe1)
-        var_germination_end = StringVar(contentframe1)
-        var_maturity_start = StringVar(contentframe1)
-        var_maturity_end = StringVar(contentframe1)
-        var_genetics_1 = StringVar(contentframe1)
-        var_genetics_2 = StringVar(contentframe1)
-        var_genetics_3 = StringVar(contentframe1)
-        var_plant_depth_min = StringVar(contentframe1)
-        var_plant_depth_max = StringVar(contentframe1)
-        var_plant_spacing_min = StringVar(contentframe1)
-        var_plant_spacing_max = StringVar(contentframe1)
-        var_number_of_plants_per_space = StringVar(contentframe1)
+        vars = [StringVar(contentframe1) for _ in range(15)]
+        (
+            var_plant_category,
+            var_plant_name,
+            var_plant_variety,
+            var_germination_start,
+            var_germination_end,
+            var_maturity_start,
+            var_maturity_end,
+            var_genetics_1,
+            var_genetics_2,
+            var_genetics_3,
+            var_plant_depth_min,
+            var_plant_depth_max,
+            var_plant_spacing_min,
+            var_plant_spacing_max,
+            var_number_of_plants_per_space,
+        ) = vars
         text_other_notes = StringVar(contentframe1)
         def submit():
             # form variables return values
-            plant_category = var_plant_category.get()
-            plant_name = var_plant_name.get()
-            plant_variety = var_plant_variety.get()
-            germination_start = var_germination_start.get()
-            germination_end = var_germination_end.get()
-            maturity_start = var_maturity_start.get()
-            maturity_end = var_maturity_end.get()
-            genetics_1 = var_genetics_1.get()
-            genetics_2 = var_genetics_2.get()
-            genetics_3 = var_genetics_3.get()
-            plant_depth_min = var_plant_depth_min.get()
-            plant_depth_max = var_plant_depth_max.get()
-            plant_spacing_min = var_plant_spacing_min.get()
-            plant_spacing_max = var_plant_spacing_max.get()
-            number_of_plants_per_space = var_number_of_plants_per_space.get()
+            (
+                plant_category,
+                plant_name,
+                plant_variety,
+                germination_start,
+                germination_end,
+                maturity_start,
+                maturity_end,
+                genetics_1,
+                genetics_2,
+                genetics_3,
+                plant_depth_min,
+                plant_depth_max,
+                plant_spacing_min,
+                plant_spacing_max,
+                number_of_plants_per_space,
+            ) = [var.get() for var in vars]
             other_notes = text_other_notes.get('1.0',END) # differs from entry
             if len(other_notes) < 2:
                 other_notes = 'none'
@@ -512,21 +574,9 @@ def menu_select(size,image,image_resize):
             plants_obj.plant_entry(submit_results)
         def populate_defaults():
             # ways to repopulate form values after submit if desired
-            var_plant_category.set(plant[1])
-            var_plant_name.set(plant[2])
-            var_plant_variety.set(plant[3])
-            var_germination_start.set(plant[4])
-            var_germination_end.set(plant[5])
-            var_maturity_start.set(plant[6])
-            var_maturity_end.set(plant[7])
-            var_genetics_1.set(plant[8])
-            var_genetics_2.set(plant[9])
-            var_genetics_3.set(plant[10])
-            var_plant_depth_min.set(plant[11])
-            var_plant_depth_max.set(plant[12])
-            var_plant_spacing_min.set(plant[13])
-            var_plant_spacing_max.set(plant[14])
-            var_number_of_plants_per_space.set(plant[15])
+            for var, val in zip(vars, plant[1:]):
+                #this shortens defining each plant[index# to each variable set in initiatal string var setup of vars]
+                var.set(val)
             text_other_notes.insert('1.0', plant[16], END)
         '''Create the widgets for the contentframe1'''
         # First all the labels
@@ -733,8 +783,7 @@ def menu_select(size,image,image_resize):
             fieldbackground=color_pallet_dict[1])
         btn_select_record = Button(contentframe1_buttons_frame, text="View Plant Detail", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
         btn_log_selected = Button(contentframe1_buttons_frame, text="Plant Log Entry", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=log_selected)
-        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
-        btn_create_selected_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
+        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Plants Log", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
 
         '''Layout the widgets in the content frame'''
         contentframe1_buttons_frame.grid(column=1, columnspan=3, row=3, padx=0, pady=0, sticky='ESW')
@@ -775,7 +824,6 @@ def menu_select(size,image,image_resize):
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
         btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
-        btn_create_selected_plant_log_pdf.grid(row=3, column=3, padx=20, pady=20, sticky='s')
 
         
     def add_plant():
@@ -1036,6 +1084,9 @@ def menu_select(size,image,image_resize):
     # Plant pdf widget
     btn_create_plant_pdf = Button(buttonsframe, text="Plants Index Card", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
 
+    # Plant Log widget
+    btn_create_plant_log = Button(buttonsframe, text="Plants Log", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=partial(plants_obj.create_plant_log_pdf,'All Plants','all'))
+
     # Exit widget
     exit_button = Button(buttonsframe, text="Exit", font=("TkDefaultFont",10,'bold'), bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=shutdown_app)    
     
@@ -1043,8 +1094,9 @@ def menu_select(size,image,image_resize):
     image_label.grid(row=0, column=0)
     showplants_button.grid(row=1, column=0, padx=15, pady=15, sticky='ew') 
     addplant_button.grid(row=2, column=0, padx=15, sticky='ew') 
-    btn_create_plant_pdf.grid(row=3, column=0, padx=15, pady=20, sticky='ew')
-    exit_button.grid(row=4, column=0, sticky='s', pady=300)
+    btn_create_plant_pdf.grid(row=3, column=0, padx=15, pady=15, sticky='ew')
+    btn_create_plant_log.grid(row=4, column=0, padx=15, sticky='ew')
+    exit_button.grid(row=5, column=0, sticky='s', pady=300)
     
 
     root.mainloop() 

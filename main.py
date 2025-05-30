@@ -7,6 +7,7 @@ Module About:
     This file is for processing of plant specific data.
     Need to correct display plant index errors when no df has yet been created
     perhaps just disable the button(s) if no plants added yet?
+    Need to fix log entry text display upon successful entry as it's text is too long
 """
 # Native
 import os
@@ -449,13 +450,13 @@ def menu_select(size,image,image_resize):
             log_topic = var_log_topic.get()
             log_date = var_log_date.get_date()
             log_where = var_log_where.get()
-            if len(log_where) < 2:
+            if not log_where:
                 log_where = 'not specified'
             log_quantity = var_log_quantity.get()
-            if len(log_quantity) < 2:
+            if not log_quantity:
                 log_quantity = 0
             log_notes = text_log_notes.get('1.0',END) # differs from entry
-            if len(log_notes) < 2:
+            if not log_notes:
                 log_notes = 'none'
             submit_results = [int(log_logindex),plant[0],str(log_topic),str(log_date),str(log_where),\
                 int(log_quantity),str(log_notes)]

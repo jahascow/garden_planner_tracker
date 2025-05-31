@@ -8,6 +8,7 @@ Module About:
     Need to correct display plant index errors when no df has yet been created
     perhaps just disable the button(s) if no plants added yet?
     Need to fix log entry text display upon successful entry as it's text is too long
+    For the full plant log need to add plant name in the output
 """
 # Native
 import os
@@ -625,23 +626,25 @@ def menu_select(size,image,image_resize):
         contentframe1.grid_columnconfigure(1, weight=3)
         
         '''Layout the widgets in the content1frame'''
-        # label widgets
-        label_plant_category.grid(row=0,column=0, padx=5, pady=5, sticky='e')
-        label_plant_name.grid(row=1,column=0, padx=5, pady=5, sticky='e')
-        label_plant_variety.grid(row=2,column=0, padx=5, pady=5, sticky='e')   
-        label_germination_start.grid(row=3,column=0, padx=5, pady=5, sticky='e') 
-        label_germination_end.grid(row=4,column=0, padx=5, pady=5, sticky='e') 
-        label_maturity_start.grid(row=5,column=0, padx=5, pady=5, sticky='e') 
-        label_maturity_end.grid(row=6,column=0, padx=5, pady=5, sticky='e') 
-        label_genetics_1.grid(row=7,column=0, padx=5, pady=5, sticky='e') 
-        label_genetics_2.grid(row=8,column=0, padx=5, pady=5, sticky='e') 
-        label_genetics_3.grid(row=9,column=0, padx=5, pady=5, sticky='e') 
-        label_plant_depth_min.grid(row=10,column=0, padx=5, pady=5, sticky='e') 
-        label_plant_depth_max.grid(row=11,column=0, padx=5, pady=5, sticky='e') 
-        label_plant_spacing_min.grid(row=12,column=0, padx=5, pady=5, sticky='e') 
-        label_plant_spacing_max.grid(row=13,column=0, padx=5, pady=5, sticky='e') 
-        label_number_of_plants_per_space.grid(row=14,column=0, padx=5, pady=5, sticky='e') 
-        label_other_notes.grid(row=15,column=0, padx=5, pady=5, sticky='ne') 
+        for i, label in enumerate([
+            label_plant_category,
+            label_plant_name,
+            label_plant_variety,
+            label_germination_start,
+            label_germination_end,
+            label_maturity_start,
+            label_maturity_end,
+            label_genetics_1,
+            label_genetics_2,
+            label_genetics_3,
+            label_plant_depth_min,
+            label_plant_depth_max,
+            label_plant_spacing_min,
+            label_plant_spacing_max,
+            label_number_of_plants_per_space,
+            label_other_notes,
+        ]):
+            label.grid(row=i, column=0, padx=5, pady=5, sticky='e')
         # entry widgets      
         entry_plant_category.grid(row=0,column=1, padx=5, pady=5)
         entry_plant_name.grid(row=1,column=1, padx=5, pady=5)

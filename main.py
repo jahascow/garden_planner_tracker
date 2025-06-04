@@ -498,9 +498,16 @@ def menu_select(size,image,image_resize):
         var_log_date = DateEntry(contentframe1, width=12, background='darkblue', foreground='white', borderwidth=2)
 
         '''Create the widgets for the contentframe1'''
-        #str(log_topic),str(log_date),str(log_where), int(log_quantity),str(log_notes)
         # First all the labels
         label_log_plant_index = Label(contentframe1, text = f'{form_update_verbose}Log for {plant[2]}, variety {plant[3]}, Plant ID #({plant[0]}):', background=color_pallet_dict[3], font=("TkDefaultFont",10,'bold'))
+        # Special settings for text wrapping of success label
+        # Set the initial wraplength
+        label_log_plant_index.configure(wraplength=contentframe1.winfo_width())   
+        # Bind the <Configure> event to update the wraplength
+        def update_wrap(event):
+            label_log_plant_index.configure(wraplength=event.width)
+        contentframe1.bind('<Configure>', update_wrap)
+                
         label_log_date = Label(contentframe1, text = 'Select date for entry:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
         label_log_topic = Label(contentframe1, text = 'Topic:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
         label_log_where = Label(contentframe1, text = 'Location:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))

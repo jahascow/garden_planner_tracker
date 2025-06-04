@@ -1133,7 +1133,7 @@ def menu_select(size,image,image_resize):
     btn_create_plant_log.grid(row=4, column=0, padx=15, sticky='ew')
     exit_button.grid(row=5, column=0, sticky='s', pady=300)
     
-
+    root.after_idle(show_plants) #start with show plants function being displayed
     root.mainloop() 
 
 if __name__ == '__main__':

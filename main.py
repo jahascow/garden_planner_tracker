@@ -854,6 +854,9 @@ def menu_select(size,image,image_resize):
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
         btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
+        if plants_obj.log_file_check == False:
+            btn_create_plant_log_pdf.config(state='disabled')
+
     def add_plant():
         clearFrame() # clear out contentframe1 contents
         # declaring string variables for storing values of entry form
@@ -1131,7 +1134,9 @@ def menu_select(size,image,image_resize):
         showplants_button.config(state='disabled')
         btn_create_plant_pdf.config(state='disabled')
         btn_create_plant_log.config(state='disabled')
-        
+    elif plants_obj.log_file_check == False:
+        btn_create_plant_log.config(state='disabled')
+        root.after_idle(show_plants) #start with show plants function being displayed                
     else:
         root.after_idle(show_plants) #start with show plants function being displayed
     root.mainloop() 

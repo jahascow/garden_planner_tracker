@@ -226,7 +226,7 @@ class Plants():
         col_width3 = 0
         col_width4 = 0
         col_width5 = 75
-        for row in data.itertuples(): print(str(row))
+        #for row in data.itertuples(): print(str(row))
         
         def get_col_width(key,column):
             # 0Log index,1Plant index,2Topic,3Date,4Where,5Quantity,6Notes
@@ -241,7 +241,7 @@ class Plants():
             col_width = min(width, (epw - col_width5) / 4)  # Ensure the column width doesn't exceed 1/4 of the page width remaining after column 5 width
             return col_width
         for key, row in enumerate(data):
-            print('all: ', key, row)
+            #print('all: ', key, row)
             if key == 0: # Date
                 #col_width = 20  # 27
                 col_width = get_col_width(key, row)
@@ -268,10 +268,24 @@ class Plants():
         th = pdf.font_size
         pdf.set_text_color(0, 0, 0)  # Set text color to black
         for index, row in data.iterrows():
-            if index % 2 != 0:
+            if plantindex == 'all':
                 pdf.set_fill_color(color_pallet_dict[4][0], color_pallet_dict[4][1], color_pallet_dict[4][2])  # Set the fill color to greyish
-            else:
+                # Conditionally selecting a cell value
+                plant_name = plants_obj.plant_df.loc[plants_obj.plant_df['Plant index'] == plants_obj.log_df['Plant index'][index]]['Plant name']
+                plant_variety = plants_obj.plant_df.loc[plants_obj.plant_df['Plant index'] == plants_obj.log_df['Plant index'][index]]['Plant variety']
+                pdf.cell(col_width, th, '', border=0, fill=True)
+                pdf.cell(col_width2, th, '', border=0, fill=True)
+                pdf.cell(col_width3, th, '', border=0, fill=True)
+                pdf.cell(col_width4, th, str(plant_name.values[0]), border=0, fill=True)
+                pdf.multi_cell(col_width5 - 5, 6, str('Variety: ')+str(plant_variety.values[0]), border=0, fill=True)
                 pdf.set_fill_color(color_pallet_dict[5][0], color_pallet_dict[5][1], color_pallet_dict[5][2])  # Set the fill color to white
+
+            
+            else: # need to just alternate row colors for each entry
+                if index % 2 != 0:
+                    pdf.set_fill_color(color_pallet_dict[4][0], color_pallet_dict[4][1], color_pallet_dict[4][2])  # Set the fill color to greyish
+                else:
+                    pdf.set_fill_color(color_pallet_dict[5][0], color_pallet_dict[5][1], color_pallet_dict[5][2])  # Set the fill color to white
 
             pdf.cell(col_width, th, str(row['Date']), border=0, fill=True)
             pdf.cell(col_width2, th, str(row['Topic']), border=0, fill=True)
@@ -1106,7 +1120,7 @@ def menu_select(size,image,image_resize):
     btn_create_plant_pdf = Button(buttonsframe, text="Plants Index Card", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=plants_obj.create_pdf) 
 
     # Plant Log widget
-    btn_create_plant_log = Button(buttonsframe, text="Plants Log", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=partial(plants_obj.create_plant_log_pdf,'All Plants','all'))
+    btn_create_plant_log = Button(buttonsframe, text="All Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=partial(plants_obj.create_plant_log_pdf,'All Plants','all'))
 
     # Exit widget
     exit_button = Button(buttonsframe, text="Exit", font=("TkDefaultFont",10,'bold'), bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=shutdown_app)    

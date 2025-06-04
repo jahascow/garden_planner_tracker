@@ -5,10 +5,8 @@ by : jahascow
 
 Module About:
     This file is for processing of plant specific data.
-    Need to correct display plant index errors when no df has yet been created
-    perhaps just disable the button(s) if no plants added yet?
     Need to fix log entry text display upon successful entry as it's text is too long
-    For the full plant log need to add plant name in the output 
+
     8 barrels: math.ceil((((math.pi*28)+4)*8)/12) = 62 feet
 """
 # Native
@@ -432,7 +430,6 @@ class Plants():
         self.refresh_log_object()
         
 def menu_select(size,image,image_resize):
-    
     global display_df
     '''Main menu for app'''
     def shutdown_app():
@@ -796,8 +793,6 @@ def menu_select(size,image,image_resize):
             else:
                 print("No row selected, showing all logs")
                 plants_obj.create_plant_log_pdf('All Plants','all')
-
-            
         display_df = plants_obj.plant_df#.drop(columns=['Plant category', 'Genetics 1'])
         # Buttoms frame for content frame 
         contentframe1_buttons_frame = Frame(contentframe1, bg=color_pallet_dict[3], width=550, height=100)
@@ -859,8 +854,6 @@ def menu_select(size,image,image_resize):
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
         btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
-
-        
     def add_plant():
         clearFrame() # clear out contentframe1 contents
         # declaring string variables for storing values of entry form
@@ -1133,7 +1126,14 @@ def menu_select(size,image,image_resize):
     btn_create_plant_log.grid(row=4, column=0, padx=15, sticky='ew')
     exit_button.grid(row=5, column=0, sticky='s', pady=300)
     
-    root.after_idle(show_plants) #start with show plants function being displayed
+    if plants_obj.file_check == False:
+        # The below buttons are disabled for a clean install
+        showplants_button.config(state='disabled')
+        btn_create_plant_pdf.config(state='disabled')
+        btn_create_plant_log.config(state='disabled')
+        
+    else:
+        root.after_idle(show_plants) #start with show plants function being displayed
     root.mainloop() 
 
 if __name__ == '__main__':

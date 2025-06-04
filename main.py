@@ -8,7 +8,8 @@ Module About:
     Need to correct display plant index errors when no df has yet been created
     perhaps just disable the button(s) if no plants added yet?
     Need to fix log entry text display upon successful entry as it's text is too long
-    For the full plant log need to add plant name in the output
+    For the full plant log need to add plant name in the output 
+    8 barrels: math.ceil((((math.pi*28)+4)*8)/12) = 62 feet
 """
 # Native
 import os
@@ -224,22 +225,40 @@ class Plants():
         col_width2 = 0
         col_width3 = 0
         col_width4 = 0
-        col_width5 = 0
+        col_width5 = 75
+        for row in data.itertuples(): print(str(row))
+        
+        def get_col_width(key,column):
+            # 0Log index,1Plant index,2Topic,3Date,4Where,5Quantity,6Notes
+            # data is a subset which does not include Log index or Plant index
+            # using itertuples applies an additional index column which we 
+            # need to account for by adding 1 
+            key+=1        
+            # Calculate the column width for the specified column
+            width = max(pdf.get_string_width(str(row[key])) for row in data.itertuples()) + 5
+            width = max(width,pdf.get_string_width(column)+5) # we need to also account for the heading being max width need and subsequent padding.
+            #for row in data.itertuples(): print(str(row))
+            col_width = min(width, (epw - col_width5) / 4)  # Ensure the column width doesn't exceed 1/4 of the page width remaining after column 5 width
+            return col_width
         for key, row in enumerate(data):
-            if key == 0:
-                col_width = 20  # 27
+            print('all: ', key, row)
+            if key == 0: # Date
+                #col_width = 20  # 27
+                col_width = get_col_width(key, row)
                 pdf.cell(col_width, th, str(row), border=1, fill=True)
-            elif key == 1:
-                col_width2 = int((epw - 15) / 4) - 10
+            elif key == 1: # Topic
+                #col_width2 = int((epw - 15) / 4) - 10
+                col_width2 = get_col_width(key, row)
                 pdf.cell(col_width2, th, str(row), border=1, fill=True)
-            elif key == 2:
-                col_width3 = int((epw - 15) / 4) - 15
+            elif key == 2: # Where
+                #col_width3 = int((epw - 15) / 4) - 15
+                col_width3 = get_col_width(key, row)
                 pdf.cell(col_width3, th, str(row), border=1, fill=True)
-            elif key == 3:
-                col_width4 = int((epw - 15) / 4) - 22
+            elif key == 3: # Quantity
+                #col_width4 = int((epw - 15) / 4) - 22
+                col_width4 = get_col_width(key, row)
                 pdf.cell(col_width4, th, str(row), border=1, fill=True)
-            else:
-                col_width5 = int((epw - 15) / 4) + 42
+            elif key == 4: # Notes
                 pdf.cell(col_width5, th, str(row), border=1, fill=True)
         # Create new line after header
         pdf.ln(th)
@@ -449,7 +468,7 @@ def menu_select(size,image,image_resize):
         def submit():
             # form variables return values
             log_topic = var_log_topic.get()
-            log_date = var_log_date.get_date()
+            log_date = var_log_date.get_date().strftime('%Y/%m/%d')
             log_where = var_log_where.get()
             if not log_where:
                 log_where = 'not specified'
@@ -626,25 +645,23 @@ def menu_select(size,image,image_resize):
         contentframe1.grid_columnconfigure(1, weight=3)
         
         '''Layout the widgets in the content1frame'''
-        for i, label in enumerate([
-            label_plant_category,
-            label_plant_name,
-            label_plant_variety,
-            label_germination_start,
-            label_germination_end,
-            label_maturity_start,
-            label_maturity_end,
-            label_genetics_1,
-            label_genetics_2,
-            label_genetics_3,
-            label_plant_depth_min,
-            label_plant_depth_max,
-            label_plant_spacing_min,
-            label_plant_spacing_max,
-            label_number_of_plants_per_space,
-            label_other_notes,
-        ]):
-            label.grid(row=i, column=0, padx=5, pady=5, sticky='e')
+        # label widgets
+        label_plant_category.grid(row=0,column=0, padx=5, pady=5, sticky='e')
+        label_plant_name.grid(row=1,column=0, padx=5, pady=5, sticky='e')
+        label_plant_variety.grid(row=2,column=0, padx=5, pady=5, sticky='e')   
+        label_germination_start.grid(row=3,column=0, padx=5, pady=5, sticky='e') 
+        label_germination_end.grid(row=4,column=0, padx=5, pady=5, sticky='e') 
+        label_maturity_start.grid(row=5,column=0, padx=5, pady=5, sticky='e') 
+        label_maturity_end.grid(row=6,column=0, padx=5, pady=5, sticky='e') 
+        label_genetics_1.grid(row=7,column=0, padx=5, pady=5, sticky='e') 
+        label_genetics_2.grid(row=8,column=0, padx=5, pady=5, sticky='e') 
+        label_genetics_3.grid(row=9,column=0, padx=5, pady=5, sticky='e') 
+        label_plant_depth_min.grid(row=10,column=0, padx=5, pady=5, sticky='e') 
+        label_plant_depth_max.grid(row=11,column=0, padx=5, pady=5, sticky='e') 
+        label_plant_spacing_min.grid(row=12,column=0, padx=5, pady=5, sticky='e') 
+        label_plant_spacing_max.grid(row=13,column=0, padx=5, pady=5, sticky='e') 
+        label_number_of_plants_per_space.grid(row=14,column=0, padx=5, pady=5, sticky='e') 
+        label_other_notes.grid(row=15,column=0, padx=5, pady=5, sticky='ne') 
         # entry widgets      
         entry_plant_category.grid(row=0,column=1, padx=5, pady=5)
         entry_plant_name.grid(row=1,column=1, padx=5, pady=5)

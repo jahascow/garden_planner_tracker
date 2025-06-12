@@ -209,7 +209,8 @@ class Plants():
             subset = plants_obj.log_df[plants_obj.log_df['Plant index'] == int(plantindex)]
         else:
             subset = plants_obj.log_df
-        data = subset[['Date', 'Topic', 'Where', 'Quantity', 'Notes']]
+        print(len(subset))
+        data = subset[['Date', 'Topic', 'Where', 'Quantity', 'Unit', 'Notes']]
         # Calculate the effective page width
         epw = pdf.w - 2 * pdf.l_margin
         # Text height is the same as current font size
@@ -226,7 +227,7 @@ class Plants():
         #for row in data.itertuples(): print(str(row))
         
         def get_col_width(key,column):
-            # 0Log index,1Plant index,2Topic,3Date,4Where,5Quantity,6Notes
+            # 0Log index,1Plant index,2Topic,3Date,4Where,5Quantity,6unit,7Notes
             # data is a subset which does not include Log index or Plant index
             # using itertuples applies an additional index column which we 
             # need to account for by adding 1 
@@ -255,7 +256,7 @@ class Plants():
                 #col_width4 = int((epw - 15) / 4) - 22
                 col_width4 = get_col_width(key, row)
                 pdf.cell(col_width4, th, str(row), border=1, fill=True)
-            elif key == 4: # Notes
+            elif key == 5: # Notes
                 pdf.cell(col_width5, th, str(row), border=1, fill=True)
         # Create new line after header
         pdf.ln(th)
@@ -287,7 +288,11 @@ class Plants():
             pdf.cell(col_width, th, str(row['Date']), border=0, fill=True)
             pdf.cell(col_width2, th, str(row['Topic']), border=0, fill=True)
             pdf.cell(col_width3, th, str(row['Where']), border=0, fill=True)
-            pdf.cell(col_width4, th, str(row['Quantity']), border=0, fill=True)
+            if row['Unit'] == 'None':
+                units = ''
+            else:
+                units = f' {row["Unit"]}' # if no unit is specified, then don't show it
+            pdf.cell(col_width4, th, str(row['Quantity']) + str(units), border=0, fill=True)
             # pdf.cell(col_width4,th,str(row['Notes']),border=0, fill=True)
             pdf.multi_cell(col_width5 - 5, 6, str(row['Notes']), border=0, fill=True)
             pdf.ln(th)
@@ -460,11 +465,7 @@ def menu_select(size,image,image_resize):
             contentframe1_buttons_frame.rowconfigure(i, weight=2)
         contentframe1_buttons_frame.rowconfigure(7, weight=1)
         contentframe1_buttons_frame.columnconfigure(1, weight=3)
-        
-        # add a select option for unit using these options: Each, Ounces, Pounds, Grams, Kilograms, Bunches
         unit_options = ['None','Each', 'Ounces', 'Pounds', 'Grams', 'Kilograms', 'Bunches']
-
-        
         #print(plant)
         # declaring string variables for storing values of entry form
         # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'

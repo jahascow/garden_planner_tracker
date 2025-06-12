@@ -209,7 +209,6 @@ class Plants():
             subset = plants_obj.log_df[plants_obj.log_df['Plant index'] == int(plantindex)]
         else:
             subset = plants_obj.log_df
-        print(len(subset))
         data = subset[['Date', 'Topic', 'Where', 'Quantity', 'Unit', 'Notes']]
         # Calculate the effective page width
         epw = pdf.w - 2 * pdf.l_margin
@@ -226,79 +225,86 @@ class Plants():
         col_width5 = 75
         #for row in data.itertuples(): print(str(row))
         
-        def get_col_width(key,column):
-            # 0Log index,1Plant index,2Topic,3Date,4Where,5Quantity,6unit,7Notes
-            # data is a subset which does not include Log index or Plant index
-            # using itertuples applies an additional index column which we 
-            # need to account for by adding 1 
-            key+=1        
-            # Calculate the column width for the specified column
-            width = max(pdf.get_string_width(str(row[key])) for row in data.itertuples()) + 5
-            width = max(width,pdf.get_string_width(column)+5) # we need to also account for the heading being max width need and subsequent padding.
-            #for row in data.itertuples(): print(str(row))
-            col_width = min(width, (epw - col_width5) / 4)  # Ensure the column width doesn't exceed 1/4 of the page width remaining after column 5 width
-            return col_width
-        for key, row in enumerate(data):
-            #print('all: ', key, row)
-            if key == 0: # Date
-                #col_width = 20  # 27
-                col_width = get_col_width(key, row)
-                pdf.cell(col_width, th, str(row), border=1, fill=True)
-            elif key == 1: # Topic
-                #col_width2 = int((epw - 15) / 4) - 10
-                col_width2 = get_col_width(key, row)
-                pdf.cell(col_width2, th, str(row), border=1, fill=True)
-            elif key == 2: # Where
-                #col_width3 = int((epw - 15) / 4) - 15
-                col_width3 = get_col_width(key, row)
-                pdf.cell(col_width3, th, str(row), border=1, fill=True)
-            elif key == 3: # Quantity
-                #col_width4 = int((epw - 15) / 4) - 22
-                col_width4 = get_col_width(key, row)
-                pdf.cell(col_width4, th, str(row), border=1, fill=True)
-            elif key == 5: # Notes
-                pdf.cell(col_width5, th, str(row), border=1, fill=True)
-        # Create new line after header
-        pdf.ln(th)
+        if len(subset) != 0: # data exists run column config
+            def get_col_width(key,column):
+                # 0Log index,1Plant index,2Topic,3Date,4Where,5Quantity,6unit,7Notes
+                # data is a subset which does not include Log index or Plant index
+                # using itertuples applies an additional index column which we 
+                # need to account for by adding 1 
+                key+=1        
+                # Calculate the column width for the specified column
+                width = max(pdf.get_string_width(str(row[key])) for row in data.itertuples()) + 5
+                width = max(width,pdf.get_string_width(column)+5) # we need to also account for the heading being max width need and subsequent padding.
+                #for row in data.itertuples(): print(str(row))
+                col_width = min(width, (epw - col_width5) / 4)  # Ensure the column width doesn't exceed 1/4 of the page width remaining after column 5 width
+                return col_width
+            for key, row in enumerate(data):
+                #print('all: ', key, row)
+                if key == 0: # Date
+                    #col_width = 20  # 27
+                    col_width = get_col_width(key, row)
+                    pdf.cell(col_width, th, str(row), border=1, fill=True)
+                elif key == 1: # Topic
+                    #col_width2 = int((epw - 15) / 4) - 10
+                    col_width2 = get_col_width(key, row)
+                    pdf.cell(col_width2, th, str(row), border=1, fill=True)
+                elif key == 2: # Where
+                    #col_width3 = int((epw - 15) / 4) - 15
+                    col_width3 = get_col_width(key, row)
+                    pdf.cell(col_width3, th, str(row), border=1, fill=True)
+                elif key == 3: # Quantity
+                    #col_width4 = int((epw - 15) / 4) - 22
+                    col_width4 = get_col_width(key, row)
+                    pdf.cell(col_width4, th, str(row), border=1, fill=True)
+                elif key == 5: # Notes
+                    pdf.cell(col_width5, th, str(row), border=1, fill=True)
+            # Create new line after header
+            pdf.ln(th)
 
-        # Iterating over rows to populate table data
-        pdf.set_font("Times", size=12)
-        th = pdf.font_size
-        pdf.set_text_color(0, 0, 0)  # Set text color to black
-        for index, row in data.iterrows():
-            if plantindex == 'all':
-                pdf.set_fill_color(color_pallet_dict[4][0], color_pallet_dict[4][1], color_pallet_dict[4][2])  # Set the fill color to greyish
-                # Conditionally selecting a cell value
-                plant_name = plants_obj.plant_df.loc[plants_obj.plant_df['Plant index'] == plants_obj.log_df['Plant index'][index]]['Plant name']
-                plant_variety = plants_obj.plant_df.loc[plants_obj.plant_df['Plant index'] == plants_obj.log_df['Plant index'][index]]['Plant variety']
-                pdf.cell(col_width, th, '', border=0, fill=True)
-                pdf.cell(col_width2, th, '', border=0, fill=True)
-                pdf.cell(col_width3, th, '', border=0, fill=True)
-                pdf.cell(col_width4, th, str(plant_name.values[0]), border=0, fill=True)
-                pdf.multi_cell(col_width5 - 5, 6, str('Variety: ')+str(plant_variety.values[0]), border=0, fill=True)
-                pdf.set_fill_color(color_pallet_dict[5][0], color_pallet_dict[5][1], color_pallet_dict[5][2])  # Set the fill color to white
-
-            
-            else: # need to just alternate row colors for each entry
-                if index % 2 != 0:
+            # Iterating over rows to populate table data
+            pdf.set_font("Times", size=12)
+            th = pdf.font_size
+            pdf.set_text_color(0, 0, 0)  # Set text color to black
+            for index, row in data.iterrows():
+                if plantindex == 'all':
                     pdf.set_fill_color(color_pallet_dict[4][0], color_pallet_dict[4][1], color_pallet_dict[4][2])  # Set the fill color to greyish
-                else:
+                    # Conditionally selecting a cell value
+                    plant_name = plants_obj.plant_df.loc[plants_obj.plant_df['Plant index'] == plants_obj.log_df['Plant index'][index]]['Plant name']
+                    plant_variety = plants_obj.plant_df.loc[plants_obj.plant_df['Plant index'] == plants_obj.log_df['Plant index'][index]]['Plant variety']
+                    pdf.cell(col_width, th, '', border=0, fill=True)
+                    pdf.cell(col_width2, th, '', border=0, fill=True)
+                    pdf.cell(col_width3, th, '', border=0, fill=True)
+                    pdf.cell(col_width4, th, str(plant_name.values[0]), border=0, fill=True)
+                    pdf.multi_cell(col_width5 - 5, 6, str('Variety: ')+str(plant_variety.values[0]), border=0, fill=True)
                     pdf.set_fill_color(color_pallet_dict[5][0], color_pallet_dict[5][1], color_pallet_dict[5][2])  # Set the fill color to white
 
-            pdf.cell(col_width, th, str(row['Date']), border=0, fill=True)
-            pdf.cell(col_width2, th, str(row['Topic']), border=0, fill=True)
-            pdf.cell(col_width3, th, str(row['Where']), border=0, fill=True)
-            if row['Unit'] == 'None':
-                units = ''
-            else:
-                units = f' {row["Unit"]}' # if no unit is specified, then don't show it
-            pdf.cell(col_width4, th, str(row['Quantity']) + str(units), border=0, fill=True)
-            # pdf.cell(col_width4,th,str(row['Notes']),border=0, fill=True)
-            pdf.multi_cell(col_width5 - 5, 6, str(row['Notes']), border=0, fill=True)
-            pdf.ln(th)
-        pdf.ln(th)
+                
+                else: # need to just alternate row colors for each entry
+                    if index % 2 != 0:
+                        pdf.set_fill_color(color_pallet_dict[4][0], color_pallet_dict[4][1], color_pallet_dict[4][2])  # Set the fill color to greyish
+                    else:
+                        pdf.set_fill_color(color_pallet_dict[5][0], color_pallet_dict[5][1], color_pallet_dict[5][2])  # Set the fill color to white
+
+                pdf.cell(col_width, th, str(row['Date']), border=0, fill=True)
+                pdf.cell(col_width2, th, str(row['Topic']), border=0, fill=True)
+                pdf.cell(col_width3, th, str(row['Where']), border=0, fill=True)
+                if row['Unit'] == 'None':
+                    units = ''
+                else:
+                    units = f' {row["Unit"]}' # if no unit is specified, then don't show it
+                pdf.cell(col_width4, th, str(row['Quantity']) + str(units), border=0, fill=True)
+                # pdf.cell(col_width4,th,str(row['Notes']),border=0, fill=True)
+                pdf.multi_cell(col_width5 - 5, 6, str(row['Notes']), border=0, fill=True)
+                pdf.ln(th)
+                pdf.ln(th)
+                post_message = 'Log Entries'
+        else:
+            pdf.set_font("Times", size=14, style="B")
+            pdf.set_text_color(0, 0, 0)
+            th = pdf.font_size
+            post_message = "No log entries"
         pdf.set_y(0)
-        pdf.cell(0, 10, f'Garden Planner & Tracker by Jahascow: "{plantsummary}" Log Entries', 0, 0, 'C')
+        pdf.cell(0, 10, f'Garden Planner & Tracker by Jahascow: "{plantsummary}" {post_message}', 0, 0, 'C')
         pdf.output(pdf_file, 'F')
         subprocess.Popen([pdf_file], shell=True)
     def create_pdf(self):

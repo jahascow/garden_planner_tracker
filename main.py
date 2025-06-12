@@ -398,8 +398,8 @@ class Plants():
             'Date': [submit_results[3]], # specify a date for this log entry
             'Where': [submit_results[4]], # way to differentiate where an action for this log entry refers to; eg main garden, wicking tub
             'Quantity': [submit_results[5]], # if tracking of an amount of something done like planting of a tomato you can track how many
-            'Notes': [submit_results[6]] # open text for any information you want to log for future refrerence
-
+            'Unit': [submit_results[6]], # if tracking of an amount of something done like planting of a tomato you can track how many
+            'Notes': [submit_results[7]] # open text for any information you want to log for future refrerence
         }
         self.log_df_new = pd.DataFrame(data_temp)
     def plant_update(self,submit_results):
@@ -491,10 +491,13 @@ def menu_select(size,image,image_resize):
             if not log_quantity:
                 log_quantity = 0
             log_notes = text_log_notes.get('1.0',END) # differs from entry
+            log_unit = var_log_unit.get()
+            log_notes = text_log_notes.get('1.0',END) # differs from entry
+
             if not log_notes:
                 log_notes = 'none'
             submit_results = [int(log_logindex),plant[0],str(log_topic),str(log_date),str(log_where),\
-                int(log_quantity),str(log_notes)]
+                int(log_quantity),str(log_unit),str(log_notes)]
             plants_obj.log_entry(submit_results)
             populate_defaults()
         

@@ -6,11 +6,10 @@ by : jahascow
 Module About:
     This file is for processing of plant specific data.
     Need to fix log entry text display upon successful entry as it's text is too long
-    for plant log add column for unit type eg each, ounce, pound
-    for plant edit form, there is an error that needs fixing, try to adjust the tomato from fruit to vegetable category and it currently fails
     make button to show harvest logs or on splant specific show harvest logs?
     Or make button plant specific that opens form with a current value field that then has a 
         button to hit calculate so you can get the value of the produce? maybe date range?
+    for log_selected_entry populate defaults method there is a commented out refresh log object, see if that needs to be uncommented
     8 barrels: math.ceil((((math.pi*28)+4)*8)/12) = 62 feet
 """
 # Native

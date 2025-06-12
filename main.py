@@ -462,7 +462,7 @@ def menu_select(size,image,image_resize):
         contentframe1_buttons_frame.columnconfigure(1, weight=3)
         
         # add a select option for unit using these options: Each, Ounces, Pounds, Grams, Kilograms, Bunches
-        unit_options = ['Each', 'Ounces', 'Pounds', 'Grams', 'Kilograms', 'Bunches']
+        unit_options = ['None','Each', 'Ounces', 'Pounds', 'Grams', 'Kilograms', 'Bunches']
 
         
         #print(plant)
@@ -490,7 +490,6 @@ def menu_select(size,image,image_resize):
             log_quantity = var_log_quantity.get()
             if not log_quantity:
                 log_quantity = 0
-            log_notes = text_log_notes.get('1.0',END) # differs from entry
             log_unit = var_log_unit.get()
             log_notes = text_log_notes.get('1.0',END) # differs from entry
 

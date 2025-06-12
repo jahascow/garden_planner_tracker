@@ -1,6 +1,7 @@
 Plant index,Plant category,Plant name,Plant variety,Germination start,Germination end,Maturity start,Maturity end,Genetics 1,Genetics 2,Genetics 3,Plant depth start,Plant depth end,Plant spacing start,Plant spacing end,Number of plants per space,Other notes
 1,Vegetables,Broccoli,Waltham 29,10,21,0,74,Heirloom,Annual,Full Sun,0.25,0.25,16.0,16.0,1.0,none
-2,Fruits,Tomato,Baxter's Bush Cherry,7,10,0,0,Heirloom,Annual,Full Sun,0.25,0.25,36.0,36.0,1.0,determinate
+2,Vegetables,Tomato,Baxter's Bush Cherry,7,10,0,0,Heirloom,Annual,Full Sun,0.25,0.25,36.0,36.0,1.0,"determinate
+"
 3,Vegetables,Tomato,Roma,7,10,80,90,Hybrid,Annual,Full Sun,0.25,0.25,24.0,36.0,1.0,determinate
 4,Vegetables,Pepperoncini,Greek Hot Pepper,10,21,0,65,Heirloom,Annual,Full Sun,0.25,0.25,18.0,24.0,1.0,none
 5,Herbs,Rosemary,Rosemary,14,21,90,400,Heirloom,Perennial,Full Sun,0.25,0.25,18.0,18.0,3.0,"none

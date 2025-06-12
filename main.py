@@ -604,12 +604,20 @@ def menu_select(size,image,image_resize):
             other_notes = text_other_notes.get('1.0',END) # differs from entry
             if len(other_notes) < 2:
                 other_notes = 'none'
+            print(plant[0],type(plant_category),type(plant_name),type(plant_variety),\
+                type(germination_start),type(germination_end),type(maturity_start),\
+                type(maturity_end),type(genetics_1),type(genetics_2),type(genetics_3),\
+                type(plant_depth_min),type(plant_depth_max),type(plant_spacing_min),\
+                type(plant_spacing_max),type(number_of_plants_per_space),type(other_notes))
+            print(plant[0],plant_category,plant_name,plant_variety,germination_start,germination_end,maturity_start,\
+                maturity_end,genetics_1,genetics_2,genetics_3,plant_depth_min,plant_depth_max,plant_spacing_min,\
+                plant_spacing_max,number_of_plants_per_space,other_notes)
             submit_results = [plant[0],str(plant_category),str(plant_name),str(plant_variety),\
                 int(germination_start),int(germination_end),int(maturity_start),\
                 int(maturity_end),str(genetics_1),str(genetics_2),str(genetics_3),\
                 float(plant_depth_min),float(plant_depth_max),float(plant_spacing_min),\
-                float(plant_spacing_max),int(number_of_plants_per_space),str(other_notes)]
-            plants_obj.plant_entry(submit_results)
+                float(plant_spacing_max),float(number_of_plants_per_space),str(other_notes)]
+            plants_obj.plant_update(submit_results=submit_results)
         def populate_defaults():
             # ways to repopulate form values after submit if desired
             for var, val in zip(vars, plant[1:]):
@@ -864,7 +872,6 @@ def menu_select(size,image,image_resize):
         btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
         if plants_obj.log_file_check == False:
             btn_create_plant_log_pdf.config(state='disabled')
-
     def add_plant():
         clearFrame() # clear out contentframe1 contents
         # declaring string variables for storing values of entry form
@@ -909,7 +916,7 @@ def menu_select(size,image,image_resize):
                 int(maturity_end),str(genetics_1),str(genetics_2),str(genetics_3),\
                 float(plant_depth_min),float(plant_depth_max),float(plant_spacing_min),\
                 float(plant_spacing_max),int(number_of_plants_per_space),str(other_notes)]
-            plants_obj.plant_entry(submit_results)
+            plants_obj.plant_entry(submit_results=submit_results)
             # use below to populate default values for the form vs past results
             populate_defaults()
         def populate_defaults():

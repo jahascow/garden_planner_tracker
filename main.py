@@ -455,11 +455,15 @@ def menu_select(size,image,image_resize):
         contentframe1.grid_columnconfigure(1, weight=3)
         
         '''Configure contentframe1_buttons_frame layout'''
-        contentframe1_buttons_frame.grid(column=0, columnspan=3, row=6, padx=0, pady=0, sticky='ESW')
+        contentframe1_buttons_frame.grid(column=0, columnspan=3, row=7, padx=0, pady=0, sticky='ESW')
         for i in range(6):
             contentframe1_buttons_frame.rowconfigure(i, weight=2)
-        contentframe1_buttons_frame.rowconfigure(6, weight=1)
+        contentframe1_buttons_frame.rowconfigure(7, weight=1)
         contentframe1_buttons_frame.columnconfigure(1, weight=3)
+        
+        # add a select option for unit using these options: Each, Ounces, Pounds, Grams, Kilograms, Bunches
+        unit_options = ['Each', 'Ounces', 'Pounds', 'Grams', 'Kilograms', 'Bunches']
+
         
         #print(plant)
         # declaring string variables for storing values of entry form
@@ -469,6 +473,7 @@ def menu_select(size,image,image_resize):
         var_log_date = StringVar(contentframe1)
         var_log_where = StringVar(contentframe1)
         var_log_quantity = StringVar(contentframe1)
+        var_log_unit = StringVar(contentframe1)
         text_log_notes = StringVar(contentframe1)
         
         def populate_defaults():
@@ -511,14 +516,16 @@ def menu_select(size,image,image_resize):
         label_log_topic = Label(contentframe1, text = 'Topic:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
         label_log_where = Label(contentframe1, text = 'Location:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
         label_log_quantity = Label(contentframe1, text = 'Quantity:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
+        label_log_unit = Label(contentframe1, text = 'Unit:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
+        
         label_log_notes = Label(contentframe1, text = 'Notes:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
         # Entry labels
         entry_log_topic = Entry(contentframe1,textvariable=var_log_topic, width=65, font=("TkDefaultFont",10,'normal'))
         entry_log_where = Entry(contentframe1,textvariable=var_log_where, width=65, font=("TkDefaultFont",10,'normal'))
         entry_log_quantity = Entry(contentframe1,textvariable=var_log_quantity, width=65, font=("TkDefaultFont",10,'normal'))
         # text labels
-        text_log_notes = Text(contentframe1, width=65, height=20, font=("TkDefaultFont",10,'normal'))
-
+        text_log_notes = Text(contentframe1, width=65, height=18, font=("TkDefaultFont",10,'normal'))
+        
         '''Create the widgets for the contentframe1_buttons_frame'''  
         # Create a button to create log entry
         btn_submit = Button(contentframe1_buttons_frame,text = 'Create Log Entry', font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command = submit)
@@ -530,18 +537,23 @@ def menu_select(size,image,image_resize):
         label_log_topic.grid(row=2,column=0, padx=5, pady=5, sticky='ne')
         label_log_where.grid(row=3,column=0, padx=5, pady=5, sticky='ne')
         label_log_quantity.grid(row=4,column=0, padx=5, pady=5, sticky='ne')
-        label_log_notes.grid(row=5,column=0, padx=5, pady=5, sticky='ne')
+        label_log_unit.grid(row=5,column=0, padx=5, pady=5, sticky='ne')
+        label_log_notes.grid(row=6,column=0, padx=5, pady=5, sticky='ne')
         # date entry widget
         var_log_date.grid(row=1,column=1, padx=5, pady=15, sticky='w')
         # entry widgets      
         entry_log_topic.grid(row=2,column=1, padx=5, pady=5, sticky='nw')
         entry_log_where.grid(row=3,column=1, padx=5, pady=5, sticky='nw')
         entry_log_quantity.grid(row=4,column=1, padx=5, pady=5, sticky='nw')
+        # Option widgets
+        var_log_unit.set(unit_options[0])  # default value
+        option_log_unit = OptionMenu(contentframe1, var_log_unit, *unit_options)
+        option_log_unit.grid(row=5,column=1, padx=5, pady=5, sticky='nw')        
         # text widgets
-        text_log_notes.grid(row=5,column=1, padx=5, pady=5, sticky='nw')
-        
+        text_log_notes.grid(row=6,column=1, padx=5, pady=5, sticky='nw')
+
         '''Layout the widgets in the content buttons frame'''
-        btn_submit.grid(row=0,column=0,columnspan=2,pady=20,sticky='s')
+        btn_submit.grid(row=7,column=1,columnspan=2,pady=20,sticky='s')
         
         '''Tooltips Configuration'''
         tooltips = {

@@ -6,7 +6,11 @@ by : jahascow
 Module About:
     This file is for processing of plant specific data.
     Need to fix log entry text display upon successful entry as it's text is too long
-
+    for plant log add column for unit type eg each, ounce, pound
+    for plant edit form, there is an error that needs fixing, try to adjust the tomato from fruit to vegetable category and it currently fails
+    make button to show harvest logs or on splant specific show harvest logs?
+    Or make button plant specific that opens form with a current value field that then has a 
+        button to hit calculate so you can get the value of the produce? maybe date range?
     8 barrels: math.ceil((((math.pi*28)+4)*8)/12) = 62 feet
 """
 # Native
@@ -103,11 +107,6 @@ class Plants():
         self.plant_df_file = os.path.join(os.path.dirname(__file__), 'df', str('plants.csv'))
         self.file_check = os.path.isfile(self.plant_df_file)
         
-        # Reload plant data from CSV file
-        self.plant_df: pd.DataFrame = pd.read_csv(self.plant_df_file)
-
-        # Update the current plant index
-        self.plant_df_cur_index: int = int(self.plant_df['Plant index'].max())
         if not self.file_check:  # File does not exist, create DataFrame with test data
             self.plant_df = pd.DataFrame(example_plant_entry_dict)
             print('No plant entries currently exist.')
@@ -141,7 +140,7 @@ class Plants():
             print('No log entries currently exist.')
             self.log_df_cur_index = 0
         else:  # File exists, load as a DataFrame
-            self.log_df = pd.read_csv(self.log_df_file)
+            self.log_df = pd.read_csv(self.log_df_file, encoding='utf-8')
             try:
                 self.log_df_cur_index = self.log_df['Log index'].max()
             except KeyError:
@@ -172,7 +171,7 @@ class Plants():
             print('No log entries currently exist.')
             self.log_df_cur_index = 0
         else:  # File exists, load as a dataframe
-            self.log_df = pd.read_csv(self.log_df_file)
+            self.log_df = pd.read_csv(self.log_df_file, encoding='utf-8') #sep=',', engine='python')
             self.log_df_cur_index = self.log_df['Log index'].max()
     def __str__(self):
         """
@@ -800,7 +799,9 @@ def menu_select(size,image,image_resize):
             else:
                 print("No row selected, showing all logs")
                 plants_obj.create_plant_log_pdf('All Plants','all')
-        display_df = plants_obj.plant_df#.drop(columns=['Plant category', 'Genetics 1'])
+        display_df = plants_obj.plant_df.sort_values(by=['Plant category', 'Plant name', 'Plant variety', 'Plant index'], ascending=[True, True, True, True])#.drop(columns=['Plant category', 'Genetics 1'])
+        #display_df = display_df.sort_values(by=['Plant index ', 'Plant variety'], ascending=[True, False])
+
         # Buttoms frame for content frame 
         contentframe1_buttons_frame = Frame(contentframe1, bg=color_pallet_dict[3], width=550, height=100)
         # Content Frame
@@ -1134,7 +1135,7 @@ def menu_select(size,image,image_resize):
     addplant_button.grid(row=2, column=0, padx=15, sticky='ew') 
     btn_create_plant_pdf.grid(row=3, column=0, padx=15, pady=15, sticky='ew')
     btn_create_plant_log.grid(row=4, column=0, padx=15, sticky='ew')
-    exit_button.grid(row=5, column=0, sticky='s', pady=300)
+    exit_button.grid(row=5, column=0, sticky='s', pady=290)
     
     if plants_obj.file_check == False:
         # The below buttons are disabled for a clean install

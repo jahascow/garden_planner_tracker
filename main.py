@@ -193,6 +193,19 @@ class Plants():
         :return: True if the log entry exists, False otherwise (bool)
         """
         return plantindex in self.log_df['Plant index'].values
+    def log_harvest_entry_exists(self, plantindex: int ) -> bool:
+        """
+        Check if a log entry with the specified index exists with a Topic of 'Harvest'.
+
+        :param plantindex: The index of the log entry to check for plant index(int)
+        :return: True if the log entry exists, False otherwise (bool)
+        """
+        mask = (self.log_df['Plant index'] == plantindex) & (self.log_df['Topic'] == 'Harvest')
+        if mask.any():
+            return True
+        else:
+            return False
+        return plantindex in self.log_df['Plant index'].values
     def create_plant_log_pdf(self, plantsummary: str, plantindex: str) -> None:
         """
         Create a PDF file with log entries for the specified plant index.
@@ -835,17 +848,22 @@ def menu_select(size,image,image_resize):
             else:
                 print("No row selected, showing all logs")
                 plants_obj.create_plant_log_pdf('All Plants','all')
+        def calculate_selected_harvest():
+            pass
         def on_treeview_select(event):
             selected_item = trv.selection()[0]
             # Perform action here
-            #print("Selected item:", trv.item(selected_item, "values"))
             # Activate buttons applicable to selection of a plant
             # Even though plant is selected if no logs exist we don't want to enable the button
-            print(plants_obj.log_entry_exists(int(trv.item(selected_item, "values")[0])))
             if plants_obj.log_file_check and plants_obj.log_entry_exists(int(trv.item(selected_item, "values")[0])) == True:
                 btn_create_plant_log_pdf.config(state='normal')
+                if plants_obj.log_harvest_entry_exists(int(trv.item(selected_item, "values")[0])) == True:
+                    btn_calculate_selected_harvest.config(state='normal')
+                else:
+                    btn_calculate_selected_harvest.config(state='disabled')  
             else:
                 btn_create_plant_log_pdf.config(state='disabled')
+                btn_calculate_selected_harvest.config(state='disabled') 
             
         display_df = plants_obj.plant_df.sort_values(by=['Plant category', 'Plant name', 'Plant variety', 'Plant index'], ascending=[True, True, True, True])#.drop(columns=['Plant category', 'Genetics 1'])
         #display_df = display_df.sort_values(by=['Plant index ', 'Plant variety'], ascending=[True, False])
@@ -869,7 +887,8 @@ def menu_select(size,image,image_resize):
             fieldbackground=color_pallet_dict[1])
         btn_select_record = Button(contentframe1_buttons_frame, text="View Plant Detail", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
         btn_log_selected = Button(contentframe1_buttons_frame, text="Plant Log Entry", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=log_selected)
-        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Display Plants Log", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
+        btn_calculate_selected_harvest = Button(contentframe1_buttons_frame, text="Calculate Harvests", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=calculate_selected_harvest)  
+        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Show Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
 
         '''Layout the widgets in the content frame'''
         contentframe1_buttons_frame.grid(column=1, columnspan=3, row=3, padx=0, pady=0, sticky='ESW')
@@ -909,8 +928,10 @@ def menu_select(size,image,image_resize):
             df_list = []
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
-        btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
+        btn_calculate_selected_harvest.grid(row=3, column=2, padx=20, pady=20, sticky='s')
+        btn_create_plant_log_pdf.grid(row=3, column=4, padx=20, pady=20, sticky='s')
         btn_create_plant_log_pdf.config(state='disabled')
+        btn_calculate_selected_harvest.config(state='disabled')
         #bind single click event to treeview and call function that sets values.
         trv.bind("<<TreeviewSelect>>", on_treeview_select)
     def add_plant():

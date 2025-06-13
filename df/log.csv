@@ -1,90 +1,94 @@
 Log index,Plant index,Topic,Date,Where,Quantity,Unit,Notes
-1,2,Direct Sow,5/28/2025,Main Garden,1,None,"Replaced one location of the red swiss chard on the street/wood fence side, where red swiss chard did not take.  This for a fall garden harvest of cherry tomatoes
+1,2,Direct Sow,5/28/2025,Main Garden,1.0,None,"Replaced one location of the red swiss chard on the street/wood fence side, where red swiss chard did not take.  This for a fall garden harvest of cherry tomatoes
 "
-2,3,Direct Sow,5/28/2025,Main Garden,2,None,"in middle of garden fence side over seeded by poorly performing bean plants 1 of the two, the other also garden fence side but at second overhead beam of garden enclosure, inclusive of the first beam on the chicken side.  The second planting I believe replaced an underperforming tomato plant from spring planting.
+2,3,Direct Sow,5/28/2025,Main Garden,2.0,None,"in middle of garden fence side over seeded by poorly performing bean plants 1 of the two, the other also garden fence side but at second overhead beam of garden enclosure, inclusive of the first beam on the chicken side.  The second planting I believe replaced an underperforming tomato plant from spring planting.
 "
-3,7,Direct Sow,5/28/2025,Main Garden,1,None,"Replaced failing tomato at second run of garden support beam inclusive of beam closest to the coup.
+3,7,Direct Sow,5/28/2025,Main Garden,1.0,None,"Replaced failing tomato at second run of garden support beam inclusive of beam closest to the coup.
 "
-4,24,Direct Sow,5/28/2025,Main Garden,3,None,"From the street / house side toward chicken coupe... at 2nd and 2nd and 1/2 run location planted in place of bad bean plants.  then at the 3rd and 1/2 run to replace a tomato plant I killed trying to trellis
+4,24,Direct Sow,5/28/2025,Main Garden,3.0,None,"From the street / house side toward chicken coupe... at 2nd and 2nd and 1/2 run location planted in place of bad bean plants.  then at the 3rd and 1/2 run to replace a tomato plant I killed trying to trellis
 "
-5,25,Harvest,5/29/2025,Wicking bucket,1,Bunches,"from two different harvest instances
+5,25,Harvest,5/29/2025,Wicking bucket,1.0,Bunches,"from two different harvest instances
 "
-6,2,Amendments,5/30/2025,Wicking bucket,3,None,"added blood meal to the tomatoes in the wicking buckets as they do have fruit but their foilage is lighter green and less than in ground plants.  Seeing if the added nitrogen will help
+6,2,Amendments,5/30/2025,Wicking bucket,3.0,None,"added blood meal to the tomatoes in the wicking buckets as they do have fruit but their foilage is lighter green and less than in ground plants.  Seeing if the added nitrogen will help
 "
-7,26,Harvest,05/30/2025,Main Garden,1,None,"from last year propogation that was moved from container to main garden when main garden was completed, will weigh later
+7,26,Harvest,05/30/2025,Main Garden,1.0,None,"from last year propogation that was moved from container to main garden when main garden was completed, will weigh later
 "
-8,2,Seed start,05/30/2025,Garage,1,None,"
+8,2,Seed start,05/30/2025,Garage,1.0,None,"
 "
-9,7,Seed start,05/30/2025,Garage,1,None,"
+9,7,Seed start,05/30/2025,Garage,1.0,None,"
 "
-10,20,Seed start,05/30/2025,Garage,1,None,"
+10,20,Seed start,05/30/2025,Garage,1.0,None,"
 "
-11,5,Seed start,05/30/2025,Garage,1,None,"
+11,5,Seed start,05/30/2025,Garage,1.0,None,"
 "
-12,21,Seed start,05/30/2025,Garage,1,None,"
+12,21,Seed start,05/30/2025,Garage,1.0,None,"
 "
-13,22,Seed start,05/30/2025,Garage,1,None,"
+13,22,Seed start,05/30/2025,Garage,1.0,None,"
 "
-14,3,Harvest,06/02/2025,Main Garden,2,Ounces,"1 roma tomato
+14,3,Harvest,06/02/2025,Main Garden,2.0,Ounces,"1 roma tomato
 "
 15,2,Harvest,2025/06/06,Main Garden,4.8,Ounces,"4 tom from bucket container and three from a main garden plant
 "
 16,3,Harvest,2025/06/08,Main Garden,5.5,Ounces,"
 "
-17,3,Seed start,2025/06/08,Garage,4,None,"used egg carton pods with ~1/4 inch soil for planting and lightly covered.
+17,3,Seed start,2025/06/08,Garage,4.0,None,"used egg carton pods with ~1/4 inch soil for planting and lightly covered.
 grow medium used was jiffy seed starting mix
 Started use of the seed heating pad and one day following we had germination.
 
 "
-18,26,Transplant,2025/01/29,Main Garden,7,None,"Onion plants from store bought onions propagated in 2024
+18,26,Transplant,2025/01/29,Main Garden,7.0,None,"Onion plants from store bought onions propagated in 2024
 
 "
-19,25,Direct sow,2025/01/29,Main Garden,2,None,"Planted with propgated onion starts from store grocery onions.
+19,25,Direct sow,2025/01/29,Main Garden,2.0,None,"Planted with propgated onion starts from store grocery onions.
 These did not survive where planted, I think they need to be planted when the temperatures are warmer.  Since wicking bucket works may just recommend using those going forward and save the space.
 "
-20,6,Seed start,2025/01/28,Garage,4,None,"used egg carton pods with ~1/4 inch soil for planting and lightly covered. grow medium used was jiffy seed starting mix Started use of the seed heating pad and one day following we had germination. Transplanted to actual Garden 3/11/2025
+20,6,Seed start,2025/01/28,Garage,4.0,None,"used egg carton pods with ~1/4 inch soil for planting and lightly covered. grow medium used was jiffy seed starting mix Started use of the seed heating pad and one day following we had germination. Transplanted to actual Garden 3/11/2025
 
 "
-21,7,Seed start,2025/01/28,Garage,2,None,"used egg carton pods with ~1/4 inch soil for planting and lightly covered.
+21,7,Seed start,2025/01/28,Garage,2.0,None,"used egg carton pods with ~1/4 inch soil for planting and lightly covered.
 grow medium used was jiffy seed starting mix
 Started use of the seed heating pad and one day following we had germination. Transplanted to actual Garden 3/11/2025
 
 "
-22,7,Store transplant,2025/02/04,Sidewalk garden,2,None,"These where started from transplants at a depth to cover the plant pod.  120 day harvest is from seed so these will likely be ready in ~ 80 days
+22,7,Store transplant,2025/02/04,Sidewalk garden,2.0,None,"These where started from transplants at a depth to cover the plant pod.  120 day harvest is from seed so these will likely be ready in ~ 80 days
 
 "
-23,27,Direct Sow,2025/02/02,Raised Bed,6,None,"planted in raised bed made primarily of organic compost. These where store bought organic russets that had sprouted.
+23,27,Direct Sow,2025/02/02,Raised Bed,6.0,None,"planted in raised bed made primarily of organic compost. These where store bought organic russets that had sprouted.
 
 Ended up with some blight I think and I clipped back leaves and then ended up with only two plants surviving harvest yield tbd
 "
-24,28,Direct sow,2025/01/22,Raised bed,30,None,"These are costco garlic that was soaked in hydrogen peroxide first.  Next time I think I should also set in fridge for a week or so.  Need to fill in if these are hardneck or softneck when identified.  First 3 garlic plants surfaced on the 14th day as noted
+24,28,Direct sow,2025/01/22,Raised bed,30.0,None,"These are costco garlic that was soaked in hydrogen peroxide first.  Next time I think I should also set in fridge for a week or so.  Need to fill in if these are hardneck or softneck when identified.  First 3 garlic plants surfaced on the 14th day as noted
 
 "
-25,29,Direct sow,2025/02/05,Main Garden,69,None,"Used a bamboo stick to set holes to drop onion starts in which saved my back and a lot of time, highly recommend repeating upon success :). The onions where paired with tomatoes as well as some being the only plants as dividers between larger plants to fully utilize spacing as noted in the 2025 Spring Garden planting map.
+25,29,Direct sow,2025/02/05,Main Garden,69.0,None,"Used a bamboo stick to set holes to drop onion starts in which saved my back and a lot of time, highly recommend repeating upon success :). The onions where paired with tomatoes as well as some being the only plants as dividers between larger plants to fully utilize spacing as noted in the 2025 Spring Garden planting map.
 
 Many did not make it, believe they did not get enough watering & that more compost would have helped in mounding these.
 "
-26,2,Seed start,2025/02/07,Garage,5,None,"Started these out in the ~6oz planting plastic cups from the dollar general with about 1 inch seed starting mix (hydrated) compressed on bottom and 1/8 inch of seed starting mix (hydrated) placed on top.  Transplanted to actual Garden 3/11/2025
+26,2,Seed start,2025/02/07,Garage,5.0,None,"Started these out in the ~6oz planting plastic cups from the dollar general with about 1 inch seed starting mix (hydrated) compressed on bottom and 1/8 inch of seed starting mix (hydrated) placed on top.  Transplanted to actual Garden 3/11/2025
 acutal quantity unknown but theorized based on production visibility in june that we had two that went to main garden and three in container buckets
 Recommend starting seeds 1-2 weeks eariler in the garage.
 "
-27,30,Direct sow,2025/03/03,Rectangular Planter,3,None,"bought these tubers online at ebay and planted.
+27,30,Direct sow,2025/03/03,Rectangular Planter,3.0,None,"bought these tubers online at ebay and planted.
 "
-28,31,Store transplant,2025/02/08,Raised bed,2,None,"
+28,31,Store transplant,2025/02/08,Raised bed,2.0,None,"
 "
-29,32,Seed start,2025/03/13,Garage,6,None,"intended to revamped front garden bed when ready, acclimated to outside on front porch starting around the 22nd of march planted in garden 29th of march
+29,32,Seed start,2025/03/13,Garage,6.0,None,"intended to revamped front garden bed when ready, acclimated to outside on front porch starting around the 22nd of march planted in garden 29th of march
 
 "
-30,25,Seed start,2025/04/01,Wicking Bucket,1,None,"Planted several in 1 wicking bucket
+30,25,Seed start,2025/04/01,Wicking Bucket,1.0,None,"Planted several in 1 wicking bucket
 "
-31,12,Direct Sow,2025/04/02,Wicking bucket,50,None,"used potting mix made with vermiculite, pete moss, and homemade compost only
+31,12,Direct Sow,2025/04/02,Wicking bucket,50.0,None,"used potting mix made with vermiculite, pete moss, and homemade compost only
 
 "
-32,12,Harvest,2025/05/20,Front side garden,1,Bunches,"1 full bunch collected over three harvests, then the remainder of them died.  Recommend not planting in this area due to low sunlight and the direct blast of air from the garage ac.
+32,12,Harvest,2025/05/20,Front side garden,1.0,Bunches,"1 full bunch collected over three harvests, then the remainder of them died.  Recommend not planting in this area due to low sunlight and the direct blast of air from the garage ac.
 "
 33,8,Harvest,2025/06/10,Main Garden,3.0,Ounces,"from freebie squash plant
 "
 34,2,Harvest,2025/06/11,Wicking bucket,0.5,Ounces," 
 "
 35,24,Harvest,2025/06/11,Main Garden,2.2,Ounces,"
+"
+36,2,Harvest,2025/06/13,Wicking bucket,0.53,Ounces,"
+"
+37,3,Harvest,2025/06/13,Main Garden,2.12,Ounces,"
 "

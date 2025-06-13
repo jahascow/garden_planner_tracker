@@ -502,7 +502,7 @@ def menu_select(size,image,image_resize):
             if not log_notes:
                 log_notes = 'none'
             submit_results = [int(log_logindex),plant[0],str(log_topic),str(log_date),str(log_where),\
-                int(log_quantity),str(log_unit),str(log_notes)]
+                float(log_quantity),str(log_unit),str(log_notes)]
             plants_obj.log_entry(submit_results)
             populate_defaults()
         

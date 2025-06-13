@@ -17,6 +17,7 @@ import os
 import os.path
 import pandas as pd
 import subprocess
+import numpy as np
 from datetime import datetime
 
 # 3rd-Party
@@ -829,6 +830,31 @@ def menu_select(size,image,image_resize):
         btn_submit.grid(row=16,column=0,columnspan=2,pady=20,sticky='s')
         
         populate_defaults()
+    def harvest_calculator(harvest_df: pd.DataFrame, plant_name: str):
+        clearFrame() # clear out contentframe1 contents
+        # determine unit types needed for calculations
+        unit_types = harvest_df['Unit'].unique()
+        unit_types = np.sort(unit_types)
+        
+        '''Configure contentframe1 grid layout'''
+        contentframe1.grid(row=0,column=1,padx=0,pady=0)
+        contentframe1.grid_columnconfigure(0, weight=0)
+        contentframe1.grid_columnconfigure(1, weight=3)
+        
+        '''Configure contentframe1 widgets'''
+        # Create a Label widget as heading for the form
+        heading_label = ttk.Label(contentframe1, text=f"Harvest Calculator for Plant: {plant_name}", font=("Arial", 14, "bold"))
+        heading_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky='w')
+        # Create label widgets for each unit type
+        for i, unit_type in enumerate(unit_types):
+            unit_type_label = ttk.Label(contentframe1, text=unit_type)
+            unit_type_label.grid(row=i+1, column=0, padx=5, pady=5, sticky='w')
+            
+        # Create entry widgets for each unit type
+        for i, unit_type in enumerate(unit_types):
+            unit_type_entry = ttk.Entry(contentframe1)
+            unit_type_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky='w')
+
     def show_plants():
         clearFrame() # clear out contentframe1 contents
         def view_selected():
@@ -862,7 +888,8 @@ def menu_select(size,image,image_resize):
             if selected_item:
                 # Get the values of the selected item
                 harvest_df = plants_obj.harvest_df(int(trv.item(selected_item, 'values')[0]))
-                #print(harvest_df)
+                print(harvest_df)
+                harvest_calculator(harvest_df,str(trv.item(selected_item, 'values')[2]) + ': ' + str(trv.item(selected_item, 'values')[3]))
             else:
                 print("No row selected")
         def on_treeview_select(event):

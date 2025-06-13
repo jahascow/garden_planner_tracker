@@ -185,6 +185,14 @@ class Plants():
             return 'Plants Object: Example -> ' + str(self.plant_df['Plant name'][0])
         except IndexError:
             return 'Plants Object: No plants currently defined.'
+    def log_entry_exists(self, plantindex: int) -> bool:
+        """
+        Check if a log entry with the specified index exists.
+
+        :param plantindex: The index of the log entry to check for plant index(int)
+        :return: True if the log entry exists, False otherwise (bool)
+        """
+        return plantindex in self.log_df['Plant index'].values
     def create_plant_log_pdf(self, plantsummary: str, plantindex: str) -> None:
         """
         Create a PDF file with log entries for the specified plant index.
@@ -830,11 +838,14 @@ def menu_select(size,image,image_resize):
         def on_treeview_select(event):
             selected_item = trv.selection()[0]
             # Perform action here
-            print("Selected item:", trv.item(selected_item, "values"))
+            #print("Selected item:", trv.item(selected_item, "values"))
             # Activate buttons applicable to selection of a plant
             # Even though plant is selected if no logs exist we don't want to enable the button
-            if plants_obj.log_file_check == True:
+            print(plants_obj.log_entry_exists(int(trv.item(selected_item, "values")[0])))
+            if plants_obj.log_file_check and plants_obj.log_entry_exists(int(trv.item(selected_item, "values")[0])) == True:
                 btn_create_plant_log_pdf.config(state='normal')
+            else:
+                btn_create_plant_log_pdf.config(state='disabled')
             
         display_df = plants_obj.plant_df.sort_values(by=['Plant category', 'Plant name', 'Plant variety', 'Plant index'], ascending=[True, True, True, True])#.drop(columns=['Plant category', 'Genetics 1'])
         #display_df = display_df.sort_values(by=['Plant index ', 'Plant variety'], ascending=[True, False])

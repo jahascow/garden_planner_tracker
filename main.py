@@ -205,7 +205,15 @@ class Plants():
             return True
         else:
             return False
-        return plantindex in self.log_df['Plant index'].values
+    def harvest_df(self, plantindex: int):
+        """
+        Return a DataFrame with log entries for the specified plant index with a Topic of 'Harvest'.
+
+        :param plantindex: The index of the log entries to return (int)
+        :return: A DataFrame with the log entries (pd.DataFrame)
+        """
+        rows = self.log_df[(self.log_df['Plant index'] == plantindex) & (self.log_df['Topic'] == 'Harvest')]
+        return rows
     def create_plant_log_pdf(self, plantsummary: str, plantindex: str) -> None:
         """
         Create a PDF file with log entries for the specified plant index.
@@ -849,7 +857,14 @@ def menu_select(size,image,image_resize):
                 print("No row selected, showing all logs")
                 plants_obj.create_plant_log_pdf('All Plants','all')
         def calculate_selected_harvest():
-            pass
+            # Get the currently selected item
+            selected_item = trv.selection()
+            if selected_item:
+                # Get the values of the selected item
+                harvest_df = plants_obj.harvest_df(int(trv.item(selected_item, 'values')[0]))
+                #print(harvest_df)
+            else:
+                print("No row selected")
         def on_treeview_select(event):
             selected_item = trv.selection()[0]
             # Perform action here

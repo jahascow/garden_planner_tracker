@@ -827,6 +827,15 @@ def menu_select(size,image,image_resize):
             else:
                 print("No row selected, showing all logs")
                 plants_obj.create_plant_log_pdf('All Plants','all')
+        def on_treeview_select(event):
+            selected_item = trv.selection()[0]
+            # Perform action here
+            print("Selected item:", trv.item(selected_item, "values"))
+            # Activate buttons applicable to selection of a plant
+            # Even though plant is selected if no logs exist we don't want to enable the button
+            if plants_obj.log_file_check == True:
+                btn_create_plant_log_pdf.config(state='normal')
+            
         display_df = plants_obj.plant_df.sort_values(by=['Plant category', 'Plant name', 'Plant variety', 'Plant index'], ascending=[True, True, True, True])#.drop(columns=['Plant category', 'Genetics 1'])
         #display_df = display_df.sort_values(by=['Plant index ', 'Plant variety'], ascending=[True, False])
 
@@ -890,8 +899,9 @@ def menu_select(size,image,image_resize):
         btn_select_record.grid(row=3, column=0, padx=20, pady=20, sticky='se')
         btn_log_selected.grid(row=3, column=1, padx=20, pady=20, sticky='s')
         btn_create_plant_log_pdf.grid(row=3, column=2, padx=20, pady=20, sticky='s')
-        if plants_obj.log_file_check == False:
-            btn_create_plant_log_pdf.config(state='disabled')
+        btn_create_plant_log_pdf.config(state='disabled')
+        #bind single click event to treeview and call function that sets values.
+        trv.bind("<<TreeviewSelect>>", on_treeview_select)
     def add_plant():
         clearFrame() # clear out contentframe1 contents
         # declaring string variables for storing values of entry form

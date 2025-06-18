@@ -855,7 +855,7 @@ def menu_select(size,image,image_resize):
         btn_calculate_harvest = ttk.Button(contentframe1, text="Calculate Harvest", command=calculate_harvest)
 
         # Create a Label widget as heading for the form
-        heading_label = ttk.Label(contentframe1, text=f"Harvest Calculator for Plant: {plant_name}", font=("Arial", 14, "bold"))
+        heading_label = ttk.Label(contentframe1, text=f"Harvest Calculator for Plant: {plant_name}", background=color_pallet_dict[3], font=("TkDefaultFont",14,'bold'))
         heading_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky='w')
         
         # Create label widgets for each unit type
@@ -922,6 +922,8 @@ def menu_select(size,image,image_resize):
             else:
                 btn_create_plant_log_pdf.config(state='disabled')
                 btn_calculate_selected_harvest.config(state='disabled') 
+                btn_log_selected.config(state='normal')
+                btn_select_record.config(state='normal')
             
         display_df = plants_obj.plant_df.sort_values(by=['Plant category', 'Plant name', 'Plant variety', 'Plant index'], ascending=[True, True, True, True])#.drop(columns=['Plant category', 'Genetics 1'])
         #display_df = display_df.sort_values(by=['Plant index ', 'Plant variety'], ascending=[True, False])
@@ -943,10 +945,10 @@ def menu_select(size,image,image_resize):
             foreground="black",
             rowheight=25,
             fieldbackground=color_pallet_dict[1])
-        btn_select_record = Button(contentframe1_buttons_frame, text="View Plant Detail", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
-        btn_log_selected = Button(contentframe1_buttons_frame, text="Plant Log Entry", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=log_selected)
+        btn_select_record = Button(contentframe1_buttons_frame, text="Detail", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=view_selected)
+        btn_log_selected = Button(contentframe1_buttons_frame, text="Log Entry", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=log_selected)
         btn_calculate_selected_harvest = Button(contentframe1_buttons_frame, text="Calculate Harvests", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=calculate_selected_harvest)  
-        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Show Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
+        btn_create_plant_log_pdf = Button(contentframe1_buttons_frame, text="Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=pdf_log_selected)
 
         '''Layout the widgets in the content frame'''
         contentframe1_buttons_frame.grid(column=1, columnspan=3, row=3, padx=0, pady=0, sticky='ESW')
@@ -990,6 +992,8 @@ def menu_select(size,image,image_resize):
         btn_create_plant_log_pdf.grid(row=3, column=4, padx=20, pady=20, sticky='s')
         btn_create_plant_log_pdf.config(state='disabled')
         btn_calculate_selected_harvest.config(state='disabled')
+        btn_log_selected.config(state='disabled')
+        btn_select_record.config(state='disabled')
         #bind single click event to treeview and call function that sets values.
         trv.bind("<<TreeviewSelect>>", on_treeview_select)
     def add_plant():

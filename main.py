@@ -13,7 +13,7 @@ Module About:
     8 barrels: math.ceil((((math.pi*28)+4)*8)/12) = 62 feet
 """
 # Native
-import os
+import os 
 import os.path
 import pandas as pd
 import subprocess
@@ -21,7 +21,7 @@ import numpy as np
 from datetime import datetime
 
 # 3rd-Party
-from tkinter import *
+from tkinter import * # type: ignore
 from tkinter import Tk,ttk
 from tkcalendar import DateEntry
 from functools import partial # used to pass commands to tkinter functions
@@ -832,6 +832,15 @@ def menu_select(size,image,image_resize):
         populate_defaults()
     def harvest_calculator(harvest_df: pd.DataFrame, plant_name: str):
         clearFrame() # clear out contentframe1 contents
+        
+        # Create a function to calculate harvest based on user inputs
+        def calculate_harvest():
+            # get user inputs from entry widgets
+            for i, unit_type in enumerate(unit_types):
+                entry_unit = entry_units[i]
+                entry_unit_value = entry_unit.get()
+                harvest_df.loc[harvest_df['Unit'] == unit_type, 'Value'] = entry_unit_value
+            # calculate harvest based on user inputs
         # determine unit types needed for calculations
         unit_types = harvest_df['Unit'].unique()
         unit_types = np.sort(unit_types)
@@ -842,9 +851,13 @@ def menu_select(size,image,image_resize):
         contentframe1.grid_columnconfigure(1, weight=3)
         
         '''Configure contentframe1 widgets'''
+        # Create a Button widget to submit the form with the text "Calculate Harvest" and bind it to the calculate_harvest function
+        btn_calculate_harvest = ttk.Button(contentframe1, text="Calculate Harvest", command=calculate_harvest)
+
         # Create a Label widget as heading for the form
         heading_label = ttk.Label(contentframe1, text=f"Harvest Calculator for Plant: {plant_name}", font=("Arial", 14, "bold"))
         heading_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky='w')
+        
         # Create label widgets for each unit type
         for i, unit_type in enumerate(unit_types):
             unit_type_label = ttk.Label(contentframe1, text=unit_type)
@@ -854,6 +867,9 @@ def menu_select(size,image,image_resize):
         for i, unit_type in enumerate(unit_types):
             unit_type_entry = ttk.Entry(contentframe1)
             unit_type_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky='w')
+
+        # Button for calculating harvest
+        btn_calculate_harvest.grid(row=len(unit_types)+1, column=0, columnspan=2, padx=5, pady=5, sticky='w')
 
     def show_plants():
         clearFrame() # clear out contentframe1 contents

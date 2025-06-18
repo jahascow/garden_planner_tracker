@@ -12,7 +12,7 @@ Module About:
     for log_selected_entry populate defaults method there is a commented out refresh log object, see if that needs to be uncommented
     8 barrels: math.ceil((((math.pi*28)+4)*8)/12) = 62 feet
 """
-# Native
+# Native @note Top
 import os 
 import os.path
 import pandas as pd
@@ -830,7 +830,7 @@ def menu_select(size,image,image_resize):
         btn_submit.grid(row=16,column=0,columnspan=2,pady=20,sticky='s')
         
         populate_defaults()
-    def harvest_calculator(harvest_df: pd.DataFrame, plant_name: str):
+    def harvest_calculator(harvest_df: pd.DataFrame, plant_name: str): #@note harvest calculator function
         clearFrame() # clear out contentframe1 contents
         
         # Create a function to calculate harvest based on user inputs
@@ -860,7 +860,7 @@ def menu_select(size,image,image_resize):
         
         # Create label widgets for each unit type
         for i, unit_type in enumerate(unit_types):
-            unit_type_label = ttk.Label(contentframe1, text=unit_type)
+            unit_type_label = ttk.Label(contentframe1, text='Price per ' + unit_type, background=color_pallet_dict[3], font=("TkDefaultFont",12,'normal'))
             unit_type_label.grid(row=i+1, column=0, padx=5, pady=5, sticky='w')
             
         # Create entry widgets for each unit type

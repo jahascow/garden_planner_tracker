@@ -842,7 +842,16 @@ def menu_select(size,image,image_resize):
                 # obtain the value for each unit type from either a number or entered calculation
                 entry_unit_value = eval(entry_unit.get())
                 # get the sum of all quantities in harvest_df that match unit_type
-                harvest_sum = '{:,.2f}'.format(harvest_df.loc[harvest_df['Unit'] == unit_type, 'Quantity'].sum() * entry_unit_value)
+                # Get start and end dates from the date entry widgets format converted for pd.to_datetime use
+                start_date = start_date_entry.get_date().strftime('%Y/%m/%d')
+                end_date = end_date_entry.get_date().strftime('%Y/%m/%d')
+                # Filter the DataFrame for the selected date range
+                filtered_df = harvest_df[
+                    (pd.to_datetime(harvest_df['Date'], format='%Y/%m/%d') >= pd.to_datetime(start_date, format='%Y/%m/%d')) &
+                    (pd.to_datetime(harvest_df['Date'], format='%Y/%m/%d') <= pd.to_datetime(end_date, format='%Y/%m/%d'))
+                ]
+                # Calculate the sum for the filtered DataFrame
+                harvest_sum = '{:,.2f}'.format(filtered_df.loc[filtered_df['Unit'] == unit_type, 'Quantity'].sum() * entry_unit_value)
                 # Create a label to display harvest values
                 # Create a label with the text before and after the value, and color only the value
                 harvest_label = Text(
@@ -862,10 +871,12 @@ def menu_select(size,image,image_resize):
                 harvest_label.tag_add("green", start_idx, end_idx)
                 harvest_label.tag_config("green", foreground=color_pallet_dict[9])
                 harvest_label.config(state="disabled")
-                harvest_label.grid(row=len(unit_types)+1+i, column=0, padx=5, pady=5, sticky='w')
-
+                harvest_label.grid(row=len(unit_types)+3+i, column=0, padx=5, pady=5, sticky='w')
+            # add a seperator widget
+            separator = ttk.Separator(contentframe1, orient='horizontal')
+            separator.grid(row=len(unit_types)+3+len(unit_types), column=0, columnspan=2, padx=5, pady=5, sticky='ew')
         # determine unit types needed for calculations
-        unit_types = harvest_df['Unit'].unique()
+        unit_types = harvest_df['Unit'].dropna().astype(str).unique()
         unit_types = np.sort(unit_types)
         
         '''Configure contentframe1 grid layout'''
@@ -904,8 +915,8 @@ def menu_select(size,image,image_resize):
             unit_type_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky='w')
             entry_units.append(unit_type_entry)
 
-        # Button for calculating harvest (+3 is 2 for date selector fields and 1 additional more than unit types)
-        btn_calculate_harvest.grid(row=(len(unit_types)*2)+3, column=0, columnspan=2, padx=5, pady=50, sticky='s')
+        # Button for calculating harvest (+3 is 2 for date selector fields, 1 for the seperator widget upon calculation and 1 additional more than unit types)
+        btn_calculate_harvest.grid(row=(len(unit_types)*2)+4, column=0, columnspan=2, padx=5, pady=300, sticky='s')
 
     def show_plants():
         clearFrame() # clear out contentframe1 contents
@@ -958,8 +969,8 @@ def menu_select(size,image,image_resize):
             else:
                 btn_create_plant_log_pdf.config(state='disabled')
                 btn_calculate_selected_harvest.config(state='disabled') 
-                btn_log_selected.config(state='normal')
-                btn_select_record.config(state='normal')
+            btn_select_record.config(state='normal')
+            btn_log_selected.config(state='normal')
             
         display_df = plants_obj.plant_df.sort_values(by=['Plant category', 'Plant name', 'Plant variety', 'Plant index'], ascending=[True, True, True, True])#.drop(columns=['Plant category', 'Genetics 1'])
         #display_df = display_df.sort_values(by=['Plant index ', 'Plant variety'], ascending=[True, False])

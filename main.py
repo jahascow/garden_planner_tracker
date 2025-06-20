@@ -36,7 +36,8 @@ color_pallet_dict = {
     5: [255, 255, 255], # string rgb color for white
     6: [42,158,255], # string rgb color for blue
     7: '#71A57B', # in place of green
-    8: '#ffffff' # in place of white
+    8: '#ffffff', # in place of white
+    9: '#006400' # in place of dark green
 }
 example_log_entry_dict = {
     # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'
@@ -838,9 +839,31 @@ def menu_select(size,image,image_resize):
             # get user inputs from entry widgets
             for i, unit_type in enumerate(unit_types):
                 entry_unit = entry_units[i]
-                entry_unit_value = entry_unit.get()
-                harvest_df.loc[harvest_df['Unit'] == unit_type, 'Value'] = entry_unit_value
-            # calculate harvest based on user inputs
+                # obtain the value for each unit type from either a number or entered calculation
+                entry_unit_value = eval(entry_unit.get())
+                # get the sum of all quantities in harvest_df that match unit_type
+                harvest_sum = '{:,.2f}'.format(harvest_df.loc[harvest_df['Unit'] == unit_type, 'Quantity'].sum() * entry_unit_value)
+                # Create a label to display harvest values
+                # Create a label with the text before and after the value, and color only the value
+                harvest_label = Text(
+                    contentframe1,
+                    width=40,
+                    height=1,
+                    background=color_pallet_dict[3],
+                    font=("TkDefaultFont", 12, 'normal'),
+                    borderwidth=0,
+                    highlightthickness=0
+                )
+                harvest_label.insert("1.0", f"Harvest value in {unit_type}: ")
+                start_idx = harvest_label.index("end-1c")
+                harvest_label.insert("end", f"${harvest_sum}")
+                end_idx = harvest_label.index("end-1c")
+                harvest_label.insert("end", "")
+                harvest_label.tag_add("green", start_idx, end_idx)
+                harvest_label.tag_config("green", foreground=color_pallet_dict[9])
+                harvest_label.config(state="disabled")
+                harvest_label.grid(row=len(unit_types)+1+i, column=0, padx=5, pady=5, sticky='w')
+
         # determine unit types needed for calculations
         unit_types = harvest_df['Unit'].unique()
         unit_types = np.sort(unit_types)
@@ -855,21 +878,23 @@ def menu_select(size,image,image_resize):
         btn_calculate_harvest = ttk.Button(contentframe1, text="Calculate Harvest", command=calculate_harvest)
 
         # Create a Label widget as heading for the form
-        heading_label = ttk.Label(contentframe1, text=f"Harvest Calculator for Plant: {plant_name}", background=color_pallet_dict[3], font=("TkDefaultFont",14,'bold'))
+        heading_label = ttk.Label(contentframe1, text=f"Harvest Calculator for: {plant_name}", background=color_pallet_dict[3], font=("TkDefaultFont",14,'bold'))
         heading_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky='w')
         
         # Create label widgets for each unit type
         for i, unit_type in enumerate(unit_types):
             unit_type_label = ttk.Label(contentframe1, text='Price per ' + unit_type, background=color_pallet_dict[3], font=("TkDefaultFont",12,'normal'))
             unit_type_label.grid(row=i+1, column=0, padx=5, pady=5, sticky='w')
-            
-        # Create entry widgets for each unit type
+        
+        # Create entry widgets for each unit type and store them in a list
+        entry_units = []
         for i, unit_type in enumerate(unit_types):
             unit_type_entry = ttk.Entry(contentframe1)
             unit_type_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky='w')
+            entry_units.append(unit_type_entry)
 
         # Button for calculating harvest
-        btn_calculate_harvest.grid(row=len(unit_types)+1, column=0, columnspan=2, padx=5, pady=5, sticky='w')
+        btn_calculate_harvest.grid(row=(len(unit_types)*2)+1, column=0, columnspan=2, padx=5, pady=50, sticky='s')
 
     def show_plants():
         clearFrame() # clear out contentframe1 contents

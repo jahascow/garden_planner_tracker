@@ -877,6 +877,17 @@ def menu_select(size,image,image_resize):
         # Create a Button widget to submit the form with the text "Calculate Harvest" and bind it to the calculate_harvest function
         btn_calculate_harvest = ttk.Button(contentframe1, text="Calculate Harvest", command=calculate_harvest)
 
+        # Create a Select Start date and End date entry widget with corresponding labels
+        start_date_label = ttk.Label(contentframe1, text="Harvest Start:", background=color_pallet_dict[3], font=("TkDefaultFont", 12, 'normal'))
+        start_date_label.grid(row=len(unit_types)+1, column=0, padx=5, pady=5, sticky='w')
+        start_date_entry = DateEntry(contentframe1, width=12, background='darkblue', foreground='white', borderwidth=2)
+        start_date_entry.grid(row=len(unit_types)+1, column=1, padx=5, pady=5, sticky='w')
+
+        end_date_label = ttk.Label(contentframe1, text="Harvest End:", background=color_pallet_dict[3], font=("TkDefaultFont", 12, 'normal'))
+        end_date_label.grid(row=len(unit_types)+2, column=0, padx=5, pady=5, sticky='w')
+        end_date_entry = DateEntry(contentframe1, width=12, background='darkblue', foreground='white', borderwidth=2)
+        end_date_entry.grid(row=len(unit_types)+2, column=1, padx=5, pady=5, sticky='w')
+
         # Create a Label widget as heading for the form
         heading_label = ttk.Label(contentframe1, text=f"Harvest Calculator for: {plant_name}", background=color_pallet_dict[3], font=("TkDefaultFont",14,'bold'))
         heading_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky='w')
@@ -893,8 +904,8 @@ def menu_select(size,image,image_resize):
             unit_type_entry.grid(row=i+1, column=1, padx=5, pady=5, sticky='w')
             entry_units.append(unit_type_entry)
 
-        # Button for calculating harvest
-        btn_calculate_harvest.grid(row=(len(unit_types)*2)+1, column=0, columnspan=2, padx=5, pady=50, sticky='s')
+        # Button for calculating harvest (+3 is 2 for date selector fields and 1 additional more than unit types)
+        btn_calculate_harvest.grid(row=(len(unit_types)*2)+3, column=0, columnspan=2, padx=5, pady=50, sticky='s')
 
     def show_plants():
         clearFrame() # clear out contentframe1 contents

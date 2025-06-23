@@ -13,12 +13,14 @@ Module About:
     8 barrels: math.ceil((((math.pi*28)+4)*8)/12) = 62 feet
 """
 # Native @note Top
-import os 
+import os, sys
 import os.path
 import pandas as pd
 import subprocess
 import numpy as np
-from datetime import datetime
+from datetime import datetime    
+import subprocess
+import platform
 
 # 3rd-Party
 from tkinter import * # type: ignore
@@ -27,6 +29,15 @@ from tkcalendar import DateEntry
 from functools import partial # used to pass commands to tkinter functions
 from PIL import Image, ImageTk
 import fpdf
+import openpyxl
+from openpyxl.styles import PatternFill, numbers
+
+# Script configuration variables        
+# First item in list will be default
+topic_options = ['Harvest', 'Direct Sow', 'Amendments', 'Seed start', 'Transplant', 'Direct Sow', 'Store transplant']
+unit_options = ['Ounces','Each', 'Pounds', 'Grams', 'Kilograms', 'Bunches', 'None']
+where_options = ['Main Garden', 'Wicking bucket', 'Garage', 'Sidewalk Garden', 'Raised Bed', 'Rectangular Planter' 'Wicking Bucket' 'Front Side Garden']
+
 
 color_pallet_dict = {
     1: '#e6ffe6',
@@ -37,7 +48,8 @@ color_pallet_dict = {
     6: [42,158,255], # string rgb color for blue
     7: '#71A57B', # in place of green
     8: '#ffffff', # in place of white
-    9: '#006400' # in place of dark green
+    9: '#006400', # in place of dark green 
+    10: 'FFCC99' # in argb format
 }
 example_log_entry_dict = {
     # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'
@@ -469,6 +481,107 @@ class Plants():
         # refresh plant object
         self.refresh_log_object()
         
+# A function that will take all the log entries with the topic 'Harvest' and create an excel document that will have the plant name and variety with a sum of quantity for each unit type.
+def create_harvest_summary(start_date, end_date):
+    """
+    Create an Excel harvest summary for all plants between start_date and end_date (inclusive).
+    Dates should be in '%Y/%m/%d' format.
+    """
+    log_file = os.path.join(os.path.dirname(__file__), 'df', 'log.csv')
+    plants_file = os.path.join(os.path.dirname(__file__), 'df', 'plants.csv')
+    output_file = os.path.join(os.path.dirname(__file__), 'df', 'harvest_summary.xlsx')
+    if os.path.isfile(log_file) and os.path.isfile(plants_file):
+        df = pd.read_csv(log_file, encoding='utf-8')
+        plants_df = pd.read_csv(plants_file, encoding='utf-8')
+        # Convert 'Date' column to datetime
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y/%m/%d', errors='coerce')
+        # Convert input dates to datetime
+        start_dt = pd.to_datetime(start_date, format='%Y/%m/%d')
+        end_dt = pd.to_datetime(end_date, format='%Y/%m/%d')
+        # Filter by date range and 'Harvest' topic
+        harvest_df = df[
+            (df['Topic'] == 'Harvest') &
+            (df['Date'] >= start_dt) &
+            (df['Date'] <= end_dt)
+        ]
+        if not harvest_df.empty:
+            # Merge to get plant name and variety
+            merged = harvest_df.merge(
+                plants_df[['Plant index', 'Plant name', 'Plant variety']],
+                on='Plant index',
+                how='left'
+            )
+            summary_df = merged.groupby(
+                ['Plant index', 'Plant name', 'Plant variety', 'Unit'],
+                as_index=False
+            )['Quantity'].sum()
+            # Insert 'Price per Unit' column after 'Quantity'
+            summary_df.insert(
+                summary_df.columns.get_loc('Quantity') + 1,
+                'Price per Unit',
+                ''
+            )
+            # Insert 'Harvest Value' column after 'Price per Unit'
+            summary_df.insert(
+                summary_df.columns.get_loc('Price per Unit') + 1,
+                'Harvest Value',
+                ''
+            )
+            summary_df.to_excel(output_file, index=False)
+            # Highlight 'Price per Unit' column as entry column
+            import openpyxl
+            wb = openpyxl.load_workbook(output_file)
+            ws = wb.active
+            price_col_idx = list(summary_df.columns).index('Price per Unit') + 1  # 1-based index
+            value_col_idx = list(summary_df.columns).index('Harvest Value') + 1
+            fill = PatternFill(start_color="FF" + color_pallet_dict[10], end_color="FF" + color_pallet_dict[10], fill_type="solid")
+            for row in range(2, ws.max_row + 1):
+                ws.cell(row=row, column=price_col_idx).fill = fill
+                # Set formula for Harvest Value: =Quantity * Price per Unit
+                qty_cell = ws.cell(row=row, column=list(summary_df.columns).index('Quantity') + 1)
+                price_cell = ws.cell(row=row, column=price_col_idx)
+                value_cell = ws.cell(row=row, column=value_col_idx)
+                value_cell.value = f"={qty_cell.coordinate}*{price_cell.coordinate}"
+                value_cell.number_format = '"$"#,##0.00'
+            # Highlight header cells
+            ws.cell(row=1, column=price_col_idx).fill = fill
+
+            # Set column widths based on header length + padding
+            padding = 2
+            for col_idx, col in enumerate(summary_df.columns, start=1):
+                header = str(col)
+                ws.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = len(header) + padding
+
+            # Add a cell to show the sum of the Harvest Value column
+            sum_row = ws.max_row + 2
+            ws.cell(row=sum_row, column=value_col_idx - 1, value="Total Harvest Value:")
+            sum_formula = f"=SUM({ws.cell(row=2, column=value_col_idx).coordinate}:{ws.cell(row=ws.max_row-1, column=value_col_idx).coordinate})"
+            sum_cell = ws.cell(row=sum_row, column=value_col_idx)
+            sum_cell.value = sum_formula
+            sum_cell.number_format = '"$"#,##0.00'
+            sum_cell.fill = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid")
+
+            wb.save(output_file)
+            print("Harvest summary created successfully.")
+
+            # Open the file with the system's default program (cross-platform)
+            try:
+                if platform.system() == 'Windows':
+                    os.startfile(output_file)
+                elif platform.system() == 'Darwin':
+                    subprocess.Popen(['open', output_file])
+                else:
+                    subprocess.Popen(['xdg-open', output_file])
+            except Exception as e:
+                print(f"Could not open the file automatically: {e}")
+
+        else:
+            print("No harvest entries found in log.csv for the given date range.")
+    else:
+        print("log.csv or plants.csv file does not exist.")
+
+# Example usage:
+# create_harvest_summary('2025/06/21', '2025/12/31')
 def menu_select(size,image,image_resize):
     global display_df
     '''Main menu for app'''
@@ -501,7 +614,6 @@ def menu_select(size,image,image_resize):
             contentframe1_buttons_frame.rowconfigure(i, weight=2)
         contentframe1_buttons_frame.rowconfigure(7, weight=1)
         contentframe1_buttons_frame.columnconfigure(1, weight=3)
-        unit_options = ['None','Each', 'Ounces', 'Pounds', 'Grams', 'Kilograms', 'Bunches']
         #print(plant)
         # declaring string variables for storing values of entry form
         # 'Log index', 'Plant index', 'Topic', 'Date', 'Where', 'Quantity', 'Notes'
@@ -558,12 +670,15 @@ def menu_select(size,image,image_resize):
         label_log_unit = Label(contentframe1, text = 'Unit:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
         
         label_log_notes = Label(contentframe1, text = 'Notes:', background=color_pallet_dict[3], font=("TkDefaultFont",10,'normal'))
-        # Entry labels
-        entry_log_topic = Entry(contentframe1,textvariable=var_log_topic, width=65, font=("TkDefaultFont",10,'normal'))
-        entry_log_where = Entry(contentframe1,textvariable=var_log_where, width=65, font=("TkDefaultFont",10,'normal'))
+        # Entry widgets
         entry_log_quantity = Entry(contentframe1,textvariable=var_log_quantity, width=65, font=("TkDefaultFont",10,'normal'))
-        # text labels
+        # text widgets
         text_log_notes = Text(contentframe1, width=65, height=18, font=("TkDefaultFont",10,'normal'))
+        # Option widgets
+        var_log_topic.set(topic_options[0])  # Set default value
+        entry_log_topic = OptionMenu(contentframe1, var_log_topic, *topic_options)
+        var_log_where.set(where_options[0])  # Set default value
+        entry_log_where = OptionMenu(contentframe1, var_log_where, *where_options)
         
         '''Create the widgets for the contentframe1_buttons_frame'''  
         # Create a button to create log entry
@@ -831,7 +946,43 @@ def menu_select(size,image,image_resize):
         btn_submit.grid(row=16,column=0,columnspan=2,pady=20,sticky='s')
         
         populate_defaults()
-    def harvest_calculator(harvest_df: pd.DataFrame, plant_name: str): #@note harvest calculator function
+    def harvest_calculator_all(): # I AM HERE CONVERTING THIS FUNCTION FOR GENERATING THE OUTPUT EXCEL
+            clearFrame() # clear out contentframe1 contents
+            def makeworksheet():
+                # Get the start and end dates from the date entry widgets
+                start_date = start_date_entry.get_date().strftime('%Y/%m/%d')
+                end_date = end_date_entry.get_date().strftime('%Y/%m/%d')
+                # Call the harvest_calculator function with the harvest_df and plant_name
+                create_harvest_summary(start_date, end_date)
+            '''Configure contentframe1 grid layout'''
+            contentframe1.grid(row=0,column=1,padx=0,pady=0)
+            contentframe1.grid_columnconfigure(0, weight=0)
+            contentframe1.grid_columnconfigure(1, weight=3)
+            
+            # Create a label for title of this frame
+            title_label = ttk.Label(contentframe1, text="Harvest Calculation Worksheet", background=color_pallet_dict[3], font=("TkDefaultFont", 16, 'normal'))
+            title_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky='n')
+            
+            '''Configure contentframe1 widgets'''
+            # Create a Button widget to submit the form with the text "Calculate Harvest" and bind it to the calculate_harvest function
+            btn_calculate_harvest = ttk.Button(contentframe1, text="Generate Harvest Worksheet", command=makeworksheet)
+
+            # Create a Select Start date and End date entry widget with corresponding labels
+            start_date_label = ttk.Label(contentframe1, text="Harvest Start:", background=color_pallet_dict[3], font=("TkDefaultFont", 12, 'normal'))
+            start_date_label.grid(row=1, column=0, padx=5, pady=5, sticky='w')
+            start_date_entry = DateEntry(contentframe1, width=12, background='darkblue', foreground='white', borderwidth=2)
+            start_date_entry.grid(row=1, column=1, padx=5, pady=5, sticky='w')
+
+            end_date_label = ttk.Label(contentframe1, text="Harvest End:", background=color_pallet_dict[3], font=("TkDefaultFont", 12, 'normal'))
+            end_date_label.grid(row=2, column=0, padx=5, pady=5, sticky='w')
+            end_date_entry = DateEntry(contentframe1, width=12, background='darkblue', foreground='white', borderwidth=2)
+            end_date_entry.grid(row=2, column=1, padx=5, pady=5, sticky='w')
+           
+
+            # Button for calculating harvest (+3 is 2 for date selector fields, 1 for the seperator widget upon calculation and 1 additional more than unit types)
+            btn_calculate_harvest.grid(row=2+4, column=0, columnspan=2, padx=5, pady=300, sticky='s')
+
+    def harvest_calculator(harvest_df: pd.DataFrame, plant_name: str): #
         clearFrame() # clear out contentframe1 contents
         
         # Create a function to calculate harvest based on user inputs
@@ -1303,6 +1454,9 @@ def menu_select(size,image,image_resize):
 
     # Plant Log widget
     btn_create_plant_log = Button(buttonsframe, text="All Plant Logs", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=partial(plants_obj.create_plant_log_pdf,'All Plants','all'))
+    
+    # Plant Harvest Calculator widget
+    btn_open_harvest_calculator = Button(buttonsframe, text="Harvest Worksheet", font=("TkDefaultFont",10,'bold'), background=color_pallet_dict[7], fg=color_pallet_dict[8], command=harvest_calculator_all)
 
     # Exit widget
     exit_button = Button(buttonsframe, text="Exit", font=("TkDefaultFont",10,'bold'), bg=color_pallet_dict[7], fg=color_pallet_dict[8], command=shutdown_app)    
@@ -1313,8 +1467,9 @@ def menu_select(size,image,image_resize):
     addplant_button.grid(row=2, column=0, padx=15, sticky='ew') 
     btn_create_plant_pdf.grid(row=3, column=0, padx=15, pady=15, sticky='ew')
     btn_create_plant_log.grid(row=4, column=0, padx=15, sticky='ew')
-    exit_button.grid(row=5, column=0, sticky='s', pady=290)
-    
+    btn_open_harvest_calculator.grid(row=5, column=0, padx=15, pady=15, sticky='ew')
+    exit_button.grid(row=6, column=0, sticky='s', pady=200)
+
     if plants_obj.file_check == False:
         # The below buttons are disabled for a clean install
         showplants_button.config(state='disabled')
@@ -1331,3 +1486,5 @@ if __name__ == '__main__':
     plants_obj = Plants()
     menu_select('800x600',os.path.join(os.path.dirname(__file__), 
                 'assets', str('plants_bg.png')),(143,75))
+    
+
